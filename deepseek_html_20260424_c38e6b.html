@@ -1744,6 +1744,548 @@
             }
             // Продолжение следует...
             // ============================================================
+                        // ============================================================
+            //  СОЗДАНИЕ ТЕМЫ (вызывается из openCreateTopicModal)
+            // ============================================================
+            function createTopic(title, content, attachments) {
+                if (!isLoggedIn()) return null;
+                const userId = getCurrentUserId();
+                const topics = getData(KEYS.TOPICS) || [];
+                const topicId = getNextId('topics');
+                const newTopic = {
+                    id: topicId,
+                    title: title,
+                    authorId: userId,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    messageCount: 1
+                };
+                topics.push(newTopic);
+                setData(KEYS.TOPICS, topics);
+                incrementUserTopicCount(userId);
+
+                // Создаём первое сообщение темы
+                const messages = getData(KEYS.MESSAGES) || [];
+                const messageId = getNextId('messages');
+                const newMessage = {
+                    id: messageId,
+                    topicId: topicId,
+                    authorId: userId,
+                    body: content,
+                    attachments: attachments || [],
+                    parentId: null,
+                    createdAt: new Date().toISOString()
+                };
+                messages.push(newMessage);
+                setData(KEYS.MESSAGES, messages);
+                incrementUserMessageCount(userId);
+                return topicId;
+            }
+
+            function getTopicById(topicId) {
+                const topics = getData(KEYS.TOPICS) || [];
+                return topics.find(t => t.id === topicId) || null;
+            }
+
+            function getMessagesForTopic(topicId) {
+                const messages = getData(KEYS.MESSAGES) || [];
+                return messages.filter(m => m.topicId === topicId).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            }
+
+            // ============================================================
+            //  ДРЕВОВИДНОЕ ПОСТРОЕНИЕ СООБЩЕНИЙ
+            // ============================================================
+            function buildMessageTree(messages) {
+                const map = {};
+                const roots = [];
+                for (const msg of messages) {
+                    map[msg.id] = { ...msg, children: [] };
+                }
+                for (const msg of Object.values(map)) {
+                    if (msg.parentId && map[msg.parentId]) {
+                        map[msg.parentId].children.push(msg);
+                    } else {
+                        roots.push(msg);
+                    }
+                }
+                return roots;
+            }
+
+            function renderMessageTree(nodes, depth = 0) {
+                let html = '';
+                for (const node of nodes) {
+                    const author = getUserById(node.authorId);
+                    const authorName = author ? escapeHTML(author.username) : 'Неизвестный';
+                    const authorAvatar = author?.avatar ? `<img src="${escapeHTML(author.avatar)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;margin-right:4px;">` : '';
+                    const quoteHtml = node.parentId ? `<div class="quote-block">↪ В ответ на сообщение #${node.parentId}</div>` : '';
+                    html += `
+                        <div class="message-item" style="margin-left:${depth * 20}px;" data-message-id="${node.id}">
+                            <div class="message-author">
+                                ${authorAvatar} ${authorName}
+                                <span class="message-time">${formatDate(node.createdAt)}</span>
+                            </div>
+                            <div class="message-body">
+                                ${quoteHtml}
+                                ${sanitizeText(node.body)}
+                                ${renderAttachments(node.attachments)}
+                            </div>
+                            ${isLoggedIn() ? `<button class="reply-btn" data-reply-to="${node.id}">💬 Ответить</button>` : ''}
+                            <div class="message-thread" id="children-${node.id}">
+                                ${node.children.length > 0 ? renderMessageTree(node.children, depth + 1) : ''}
+                            </div>
+                        </div>`;
+                }
+                return html;
+            }
+
+            // ============================================================
+            //  ОТОБРАЖЕНИЕ ТЕМЫ
+            // ============================================================
+            function renderTopicView() {
+                if (!currentTopicId) {
+                    navigateTo('topics');
+                    return;
+                }
+                const topic = getTopicById(currentTopicId);
+                if (!topic) {
+                    document.getElementById('viewContainer').innerHTML = '<div class="empty-state"><h3>Тема не найдена</h3></div>';
+                    return;
+                }
+                const messages = getMessagesForTopic(currentTopicId);
+                const tree = buildMessageTree(messages);
+                const author = getUserById(topic.authorId);
+                const authorName = author ? escapeHTML(author.username) : 'Неизвестный';
+
+                let html = `
+                    <div style="margin-bottom:16px;">
+                        <button class="btn btn-outline btn-sm" id="btnBackToTopics">◀ Назад к темам</button>
+                    </div>
+                    <div class="card" style="margin-bottom:20px;">
+                        <h1 style="font-family:var(--font-heading);font-size:1.8rem;margin-bottom:8px;">${escapeHTML(topic.title)}</h1>
+                        <div class="card-meta">
+                            <span>👤 ${authorName}</span>
+                            <span>🕐 ${formatDate(topic.createdAt)}</span>
+                            <span>✉ ${topic.messageCount || 0}</span>
+                        </div>
+                    </div>`;
+
+                html += '<div id="topicMessages">';
+                html += renderMessageTree(tree);
+                html += '</div>';
+
+                if (isLoggedIn()) {
+                    html += `
+                        <div class="card mt-16" id="replyFormCard">
+                            <h3 style="font-family:var(--font-heading);">✍️ Новое сообщение</h3>
+                            <div class="form-group">
+                                <textarea class="form-textarea" id="replyBody" placeholder="Текст сообщения..." rows="4"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Вложения (URL или файлы)</label>
+                                <input type="text" class="form-input" id="replyUrl" placeholder="Ссылка на изображение/видео">
+                                <div class="flex-row gap-8 mt-8">
+                                    <button class="btn btn-outline btn-sm" id="btnAddAttachmentReply">📎 Загрузить</button>
+                                    <span class="form-hint" id="replyAttachmentHint"></span>
+                                </div>
+                                <div id="replyAttachmentPreview" class="flex-row gap-8 mt-8"></div>
+                            </div>
+                            <div id="replyError" style="color:#ff6666!important;min-height:20px;" class="mt-8"></div>
+                            <button class="btn btn-primary mt-8" id="btnSubmitReply">Отправить</button>
+                            <input type="hidden" id="replyParentId" value="">
+                        </div>`;
+                }
+
+                document.getElementById('viewContainer').innerHTML = html;
+
+                // Обработчик кнопки "Назад"
+                document.getElementById('btnBackToTopics').addEventListener('click', () => navigateTo('topics'));
+
+                // Обработчики ответов
+                if (isLoggedIn()) {
+                    let tempReplyAttachments = [];
+                    document.getElementById('btnSubmitReply').addEventListener('click', function() {
+                        const body = document.getElementById('replyBody').value.trim();
+                        const urlInput = document.getElementById('replyUrl').value.trim();
+                        const parentId = parseInt(document.getElementById('replyParentId').value) || null;
+                        const errorEl = document.getElementById('replyError');
+
+                        if (!body && tempReplyAttachments.length === 0 && !urlInput) {
+                            errorEl.textContent = 'Введите текст сообщения или добавьте вложение.';
+                            return;
+                        }
+
+                        let allAttachments = [...tempReplyAttachments];
+                        if (urlInput) {
+                            if (isImageURL(urlInput)) allAttachments.push({ type: 'image', url: urlInput, name: 'image_url' });
+                            else if (isVideoURL(urlInput)) allAttachments.push({ type: 'video', url: urlInput, name: 'video_url' });
+                            else allAttachments.push({ type: 'link', url: urlInput, name: 'link' });
+                        }
+
+                        const messageId = createMessage(currentTopicId, body, allAttachments, parentId);
+                        if (messageId) {
+                            // Обновляем счётчик сообщений в теме
+                            const topic = getTopicById(currentTopicId);
+                            if (topic) {
+                                topic.messageCount = (topic.messageCount || 0) + 1;
+                                topic.updatedAt = new Date().toISOString();
+                                const topics = getData(KEYS.TOPICS) || [];
+                                const idx = topics.findIndex(t => t.id === currentTopicId);
+                                if (idx !== -1) {
+                                    topics[idx] = topic;
+                                    setData(KEYS.TOPICS, topics);
+                                }
+                            }
+                            // Очищаем форму и перерендериваем
+                            document.getElementById('replyBody').value = '';
+                            document.getElementById('replyUrl').value = '';
+                            document.getElementById('replyParentId').value = '';
+                            document.getElementById('replyAttachmentPreview').innerHTML = '';
+                            tempReplyAttachments = [];
+                            document.getElementById('replyError').textContent = '';
+                            renderTopicView(); // полный перерендер (можно оптимизировать, но норм)
+                        } else {
+                            errorEl.textContent = 'Ошибка при отправке сообщения.';
+                        }
+                    });
+
+                    document.getElementById('btnAddAttachmentReply').addEventListener('click', function() {
+                        const input = document.getElementById('hiddenAttachmentInput');
+                        input.click();
+                        input.onchange = async function() {
+                            const files = Array.from(input.files);
+                            const previewDiv = document.getElementById('replyAttachmentPreview');
+                            const hintEl = document.getElementById('replyAttachmentHint');
+                            for (const file of files) {
+                                const sizeCheck = validateFileSize(file, 2);
+                                if (!sizeCheck.valid) {
+                                    hintEl.textContent = sizeCheck.error;
+                                    continue;
+                                }
+                                try {
+                                    const base64 = await fileToBase64(file);
+                                    const type = isImageFile(file) ? 'image' : (isVideoFile(file) ? 'video' : 'file');
+                                    tempReplyAttachments.push({ type, url: base64, name: file.name });
+                                    if (type === 'image') {
+                                        previewDiv.innerHTML += `<img src="${base64}" class="attachment-preview" style="max-width:80px;max-height:60px;" title="${escapeHTML(file.name)}">`;
+                                    } else if (type === 'video') {
+                                        previewDiv.innerHTML += `<video src="${base64}" class="attachment-preview" style="max-width:80px;max-height:60px;" muted title="${escapeHTML(file.name)}"></video>`;
+                                    }
+                                    hintEl.textContent = `Загружено: ${tempReplyAttachments.length} файл(ов)`;
+                                } catch (e) {
+                                    hintEl.textContent = 'Ошибка загрузки.';
+                                }
+                            }
+                            input.value = '';
+                        };
+                    });
+
+                    // Обработчики кнопок "Ответить" у сообщений
+                    document.querySelectorAll('.reply-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const messageId = parseInt(this.dataset.replyTo);
+                            document.getElementById('replyParentId').value = messageId;
+                            document.getElementById('replyBody').focus();
+                            window.scrollTo({ top: document.getElementById('replyFormCard').offsetTop - 80, behavior: 'smooth' });
+                        });
+                    });
+                }
+            }
+
+            function createMessage(topicId, body, attachments, parentId = null) {
+                if (!isLoggedIn()) return null;
+                const userId = getCurrentUserId();
+                const messages = getData(KEYS.MESSAGES) || [];
+                const messageId = getNextId('messages');
+                const newMessage = {
+                    id: messageId,
+                    topicId: topicId,
+                    authorId: userId,
+                    body: body,
+                    attachments: attachments || [],
+                    parentId: parentId,
+                    createdAt: new Date().toISOString()
+                };
+                messages.push(newMessage);
+                setData(KEYS.MESSAGES, messages);
+                incrementUserMessageCount(userId);
+                return messageId;
+            }
+
+            // ============================================================
+            //  ПОИСК
+            // ============================================================
+            function renderSearchView() {
+                const container = document.getElementById('viewContainer');
+                let html = `
+                    <h1 style="font-family:var(--font-heading);font-size:1.8rem;margin-bottom:16px;">🔍 Поиск по форуму</h1>
+                    <div class="search-bar">
+                        <input type="text" class="form-input" id="searchInput" placeholder="Введите запрос..." value="${escapeHTML(currentSearchQuery)}">
+                        <button class="btn btn-primary" id="btnSearch">Найти</button>
+                    </div>
+                    <div id="searchResults"></div>`;
+                container.innerHTML = html;
+
+                document.getElementById('btnSearch').addEventListener('click', performSearch);
+                document.getElementById('searchInput').addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') performSearch();
+                });
+
+                if (currentSearchQuery) {
+                    performSearch();
+                }
+            }
+
+            function performSearch() {
+                const query = document.getElementById('searchInput').value.trim().toLowerCase();
+                currentSearchQuery = query;
+                const resultsDiv = document.getElementById('searchResults');
+                if (!query) {
+                    resultsDiv.innerHTML = '<p class="text-muted">Введите поисковый запрос.</p>';
+                    return;
+                }
+                const topics = getData(KEYS.TOPICS) || [];
+                const messages = getData(KEYS.MESSAGES) || [];
+                const matchedTopics = [];
+
+                for (const topic of topics) {
+                    if (topic.title.toLowerCase().includes(query)) {
+                        matchedTopics.push({ ...topic, matchType: 'title' });
+                        continue;
+                    }
+                    const topicMessages = messages.filter(m => m.topicId === topic.id);
+                    if (topicMessages.some(m => m.body.toLowerCase().includes(query))) {
+                        matchedTopics.push({ ...topic, matchType: 'content' });
+                    }
+                }
+
+                if (matchedTopics.length === 0) {
+                    resultsDiv.innerHTML = '<div class="empty-state"><span class="icon">🔎</span><h3>Ничего не найдено</h3></div>';
+                    return;
+                }
+
+                let html = '';
+                for (const topic of matchedTopics) {
+                    const author = getUserById(topic.authorId);
+                    const authorName = author ? escapeHTML(author.username) : 'Неизвестный';
+                    html += `
+                        <div class="card topic-card" data-topic-id="${topic.id}" style="cursor:pointer;">
+                            <div class="card-header">
+                                <span class="card-title">${escapeHTML(topic.title)}</span>
+                                <span class="badge badge-magenta">${topic.matchType === 'title' ? 'Заголовок' : 'Содержимое'}</span>
+                            </div>
+                            <div class="card-meta">
+                                <span>👤 ${authorName}</span>
+                                <span>🕐 ${formatDate(topic.createdAt)}</span>
+                                <span>✉ ${topic.messageCount || 0}</span>
+                            </div>
+                        </div>`;
+                }
+                resultsDiv.innerHTML = html;
+                resultsDiv.querySelectorAll('.topic-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        navigateTo('topic', { topicId: parseInt(this.dataset.topicId) });
+                    });
+                });
+            }
+
+            // ============================================================
+            //  ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
+            // ============================================================
+            function renderProfileView() {
+                const userId = currentProfileUserId || getCurrentUserId();
+                if (!userId) {
+                    navigateTo('topics');
+                    return;
+                }
+                const user = getUserById(userId);
+                if (!user) {
+                    document.getElementById('viewContainer').innerHTML = '<div class="empty-state"><h3>Пользователь не найден</h3></div>';
+                    return;
+                }
+                const isOwner = isLoggedIn() && getCurrentUserId() === userId;
+                const container = document.getElementById('viewContainer');
+
+                let html = `
+                    <div class="profile-header">
+                        ${user.avatar ? `<img src="${escapeHTML(user.avatar)}" class="profile-avatar" alt="Avatar">` : '<div class="profile-avatar-placeholder">👤</div>'}
+                        <div class="profile-info">
+                            <h2>${escapeHTML(user.username)}</h2>
+                            <div class="profile-stats">
+                                <span>📋 Тем: ${user.topicCount || 0}</span>
+                                <span>💬 Сообщений: ${user.messageCount || 0}</span>
+                            </div>
+                            ${user.bio ? `<p class="mt-8 text-muted">${escapeHTML(user.bio)}</p>` : ''}
+                        </div>
+                    </div>`;
+
+                if (isOwner) {
+                    html += `<button class="btn btn-outline" id="btnEditProfile">✏️ Редактировать профиль</button>`;
+                }
+
+                container.innerHTML = html;
+
+                if (isOwner) {
+                    document.getElementById('btnEditProfile').addEventListener('click', openEditProfileModal);
+                }
+            }
+
+            function openEditProfileModal() {
+                const user = getCurrentUser();
+                if (!user) return;
+                const modalId = 'editProfileModal';
+                const contentHTML = `
+                    <h2>✏️ Редактирование профиля</h2>
+                    <div class="form-group">
+                        <label>Никнейм</label>
+                        <input type="text" class="form-input" id="editUsername" value="${escapeHTML(user.username)}" maxlength="30">
+                    </div>
+                    <div class="form-group">
+                        <label>О себе</label>
+                        <textarea class="form-textarea" id="editBio" rows="3">${escapeHTML(user.bio || '')}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Аватар</label>
+                        <div class="flex-row gap-8">
+                            <button class="btn btn-outline btn-sm" id="btnChangeAvatar">📷 Загрузить аватар</button>
+                            ${user.avatar ? '<button class="btn btn-danger btn-sm" id="btnRemoveAvatar">Удалить</button>' : ''}
+                        </div>
+                        <div id="avatarPreview" class="mt-8">${user.avatar ? `<img src="${escapeHTML(user.avatar)}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">` : ''}</div>
+                        <input type="file" id="editAvatarInput" accept="image/*" class="hidden">
+                    </div>
+                    <div id="editProfileError" style="color:#ff6666!important;min-height:20px;" class="mt-8"></div>
+                    <button class="btn btn-primary mt-8" id="btnSaveProfile">Сохранить</button>
+                `;
+                openModal(modalId, contentHTML);
+
+                let tempAvatar = user.avatar; // текущий или новый
+
+                document.getElementById('btnChangeAvatar').addEventListener('click', function() {
+                    document.getElementById('editAvatarInput').click();
+                });
+                document.getElementById('editAvatarInput').addEventListener('change', async function() {
+                    const file = this.files[0];
+                    if (!file) return;
+                    if (!isImageFile(file)) {
+                        document.getElementById('editProfileError').textContent = 'Можно загружать только изображения.';
+                        return;
+                    }
+                    const sizeCheck = validateFileSize(file, 2);
+                    if (!sizeCheck.valid) {
+                        document.getElementById('editProfileError').textContent = sizeCheck.error;
+                        return;
+                    }
+                    try {
+                        tempAvatar = await fileToBase64(file);
+                        document.getElementById('avatarPreview').innerHTML = `<img src="${tempAvatar}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">`;
+                        document.getElementById('editProfileError').textContent = '';
+                    } catch (e) {
+                        document.getElementById('editProfileError').textContent = 'Ошибка загрузки.';
+                    }
+                });
+
+                const btnRemove = document.getElementById('btnRemoveAvatar');
+                if (btnRemove) {
+                    btnRemove.addEventListener('click', function() {
+                        tempAvatar = null;
+                        document.getElementById('avatarPreview').innerHTML = '';
+                    });
+                }
+
+                document.getElementById('btnSaveProfile').addEventListener('click', async function() {
+                    const newUsername = document.getElementById('editUsername').value.trim();
+                    const newBio = document.getElementById('editBio').value.trim();
+                    const errorEl = document.getElementById('editProfileError');
+                    if (newUsername.length < 2) {
+                        errorEl.textContent = 'Ник должен содержать минимум 2 символа.';
+                        return;
+                    }
+                    const updates = { username: newUsername, bio: newBio, avatar: tempAvatar };
+                    const success = updateUserProfile(user.id, updates);
+                    if (success) {
+                        closeModal(modalId);
+                        renderHeader();
+                        navigateTo('profile', { userId: user.id });
+                    } else {
+                        errorEl.textContent = 'Ошибка при сохранении. Возможно, ник занят.';
+                    }
+                });
+            }
+
+            // ============================================================
+            //  УПРАВЛЕНИЕ ЛОГОТИПОМ
+            // ============================================================
+            function initLogoHandlers() {
+                document.getElementById('btnUploadLogo').addEventListener('click', function() {
+                    document.getElementById('hiddenLogoInput').click();
+                });
+                document.getElementById('hiddenLogoInput').addEventListener('change', async function() {
+                    const file = this.files[0];
+                    if (!file) return;
+                    if (!isImageFile(file)) {
+                        alert('Пожалуйста, выберите изображение.');
+                        return;
+                    }
+                    const sizeCheck = validateFileSize(file, 2);
+                    if (!sizeCheck.valid) {
+                        alert(sizeCheck.error);
+                        return;
+                    }
+                    try {
+                        const base64 = await fileToBase64(file);
+                        setLogo(base64);
+                        renderHeader();
+                    } catch (e) {
+                        alert('Ошибка загрузки логотипа.');
+                    }
+                    this.value = '';
+                });
+                document.getElementById('btnDeleteLogo').addEventListener('click', function() {
+                    if (confirm('Удалить логотип и вернуть текстовое название?')) {
+                        removeLogo();
+                        renderHeader();
+                    }
+                });
+            }
+
+            // ============================================================
+            //  ПРИВЯЗКА ГЛОБАЛЬНЫХ СОБЫТИЙ
+            // ============================================================
+            function bindGlobalEvents() {
+                // Кнопка входа/регистрации
+                document.getElementById('btnShowAuth').addEventListener('click', () => openAuthModal('login'));
+                document.getElementById('btnLogout').addEventListener('click', () => {
+                    logoutUser();
+                    renderHeader();
+                    navigateTo('topics');
+                });
+                // Клик по приветствию пользователя -> профиль
+                document.getElementById('userGreeting').addEventListener('click', () => {
+                    if (isLoggedIn()) navigateTo('profile', { userId: getCurrentUserId() });
+                });
+                // Клик по логотипу/названию -> главная
+                document.getElementById('logoArea').addEventListener('click', () => navigateTo('topics'));
+                // Навигация
+                document.querySelectorAll('#nav-links a[data-view]').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        navigateTo(this.dataset.view);
+                    });
+                });
+                document.getElementById('btnNewTopic').addEventListener('click', openCreateTopicModal);
+                initLogoHandlers();
+            }
+
+            // ============================================================
+            //  ЗАПУСК ПРИЛОЖЕНИЯ
+            // ============================================================
+            function initApp() {
+                renderHeader();
+                bindGlobalEvents();
+                navigateTo('topics'); // стартовый вью
+            }
+
+            initApp();
+            // Конец IIFE
         })();
     </script>
 </body>
