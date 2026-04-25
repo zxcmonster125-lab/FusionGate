@@ -1,2020 +1,461 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FusionGate — Форум</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #0f0f0f;
-            --bg-card: #141414;
-            --bg-card-hover: #1a1a1a;
-            --bg-input: #111;
-            --text-primary: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --text-muted: #666;
-            --neon-cyan: #00ffcc;
-            --neon-magenta: #ff00ff;
-            --neon-cyan-dim: rgba(0, 255, 204, 0.15);
-            --neon-magenta-dim: rgba(255, 0, 255, 0.15);
-            --neon-cyan-glow: rgba(0, 255, 204, 0.4);
-            --neon-magenta-glow: rgba(255, 0, 255, 0.4);
-            --border-subtle: rgba(255, 255, 255, 0.06);
-            --border-neon: rgba(0, 255, 204, 0.25);
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --font-heading: 'Rajdhani', 'Inter', sans-serif;
-            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
-            --font-body: 'Inter', 'Segoe UI', sans-serif;
-            --header-height: 56px;
-            --transition-fast: 0.15s ease;
-            --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FusionGate – CS:GO Cheats Forum</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            font-size: 16px;
-            scroll-behavior: smooth;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        body {
-            font-family: var(--font-body);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-            background-image:
-                linear-gradient(rgba(0, 255, 204, 0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 204, 0.025) 1px, transparent 1px);
-            background-size: 32px 32px;
-            background-position: center center;
-            background-attachment: fixed;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 255, 204, 0.3);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 255, 204, 0.55);
-        }
-
-        #header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(10, 10, 10, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border-neon);
-            box-shadow: 0 2px 20px rgba(0, 255, 204, 0.08);
-            height: var(--header-height);
-        }
-        .header-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 16px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-            cursor: pointer;
-            user-select: none;
-            transition: var(--transition-fast);
-        }
-        .logo-area:hover {
-            filter: brightness(1.2);
-        }
-        .logo-img {
-            height: 36px;
-            width: auto;
-            max-width: 140px;
-            object-fit: contain;
-            border-radius: var(--radius-sm);
-        }
-        .logo-text {
-            font-family: var(--font-heading);
-            font-size: 1.55rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            background: linear-gradient(135deg, var(--neon-cyan), #00ddaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 30px rgba(0, 255, 204, 0.5);
-            white-space: nowrap;
-        }
-        .logo-upload-btn {
-            font-size: 0.7rem;
-            padding: 4px 10px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-neon);
-            background: transparent;
-            color: var(--neon-cyan);
-            cursor: pointer;
-            font-family: var(--font-body);
-            transition: var(--transition-fast);
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .logo-upload-btn:hover {
-            background: var(--neon-cyan-dim);
-            box-shadow: 0 0 12px var(--neon-cyan-glow);
-        }
-        .logo-upload-btn.delete-logo {
-            border-color: rgba(255, 80, 80, 0.4);
-            color: #ff5555;
-            font-size: 0.65rem;
-            padding: 3px 8px;
-        }
-        .logo-upload-btn.delete-logo:hover {
-            background: rgba(255, 80, 80, 0.15);
-            box-shadow: 0 0 10px rgba(255, 80, 80, 0.35);
-        }
-
-        #nav-links {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            list-style: none;
-            flex-wrap: wrap;
-        }
-        #nav-links li a,
-        #nav-links li button {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 14px;
-            border-radius: var(--radius-md);
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-size: 0.88rem;
-            font-weight: 500;
-            cursor: pointer;
-            border: 1px solid transparent;
-            background: transparent;
-            font-family: var(--font-body);
-            transition: var(--transition-smooth);
-            white-space: nowrap;
-        }
-        #nav-links li a:hover,
-        #nav-links li button:hover {
-            color: var(--neon-cyan);
-            border-color: var(--border-neon);
-            background: var(--neon-cyan-dim);
-            box-shadow: 0 0 14px rgba(0, 255, 204, 0.2);
-        }
-        #nav-links li a.active,
-        #nav-links li button.active {
-            color: var(--neon-cyan);
-            border-color: var(--neon-cyan-glow);
-            background: rgba(0, 255, 204, 0.1);
-            box-shadow: 0 0 18px rgba(0, 255, 204, 0.3);
-        }
-
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-        .user-area .btn {
-            font-size: 0.82rem;
-            padding: 7px 16px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            font-family: var(--font-body);
-            font-weight: 500;
-            transition: var(--transition-smooth);
-            border: 1px solid transparent;
-            white-space: nowrap;
-        }
-        .btn-login {
-            background: transparent;
-            color: var(--neon-cyan);
-            border-color: var(--border-neon);
-        }
-        .btn-login:hover {
-            background: var(--neon-cyan-dim);
-            box-shadow: 0 0 16px var(--neon-cyan-glow);
-        }
-        .btn-register {
-            background: var(--neon-cyan);
-            color: #000;
-            border-color: var(--neon-cyan);
-            font-weight: 600;
-        }
-        .btn-register:hover {
-            box-shadow: 0 0 22px var(--neon-cyan-glow);
-            transform: translateY(-1px);
-        }
-        .btn-logout {
-            background: transparent;
-            color: #ff6666;
-            border-color: rgba(255, 100, 100, 0.4);
-            font-size: 0.78rem;
-            padding: 6px 12px;
-        }
-        .btn-logout:hover {
-            background: rgba(255, 100, 100, 0.12);
-            box-shadow: 0 0 14px rgba(255, 100, 100, 0.3);
-        }
-        .user-greeting {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition-fast);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .user-greeting:hover {
-            color: var(--neon-cyan);
-        }
-        .user-avatar-mini {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid var(--border-neon);
-            flex-shrink: 0;
-        }
-        .user-avatar-placeholder {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--neon-cyan-dim);
-            border: 1px solid var(--border-neon);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            color: var(--neon-cyan);
-            flex-shrink: 0;
-        }
-
-        #main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px 16px 60px;
-            min-height: calc(100vh - var(--header-height) - 60px);
-            animation: fadeInUp 0.35s ease;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 8px rgba(0, 255, 204, 0.2); }
-            50% { box-shadow: 0 0 22px rgba(0, 255, 204, 0.5); }
-        }
-        @keyframes neonFlicker {
-            0%, 100% { opacity: 1; }
-            92% { opacity: 1; }
-            93% { opacity: 0.6; }
-            94% { opacity: 1; }
-            96% { opacity: 0.75; }
-            97% { opacity: 1; }
-        }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
-            padding: 20px 24px;
-            margin-bottom: 12px;
-            transition: var(--transition-smooth);
-            position: relative;
-            overflow: hidden;
-        }
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan-glow), transparent);
-            opacity: 0;
-            transition: var(--transition-smooth);
-        }
-        .card:hover {
-            border-color: var(--border-neon);
-            box-shadow: 0 4px 24px rgba(0, 255, 204, 0.1);
-            background: var(--bg-card-hover);
-        }
-        .card:hover::before {
-            opacity: 1;
-        }
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-        .card-title {
-            font-family: var(--font-heading);
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #fff;
-            letter-spacing: 0.03em;
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-        .card-title:hover {
-            color: var(--neon-cyan);
-            text-shadow: 0 0 18px rgba(0, 255, 204, 0.4);
-        }
-        .card-meta {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-        .card-meta span {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        .badge-cyan {
-            background: var(--neon-cyan-dim);
-            color: var(--neon-cyan);
-            border: 1px solid rgba(0, 255, 204, 0.3);
-        }
-        .badge-magenta {
-            background: var(--neon-magenta-dim);
-            color: var(--neon-magenta);
-            border: 1px solid rgba(255, 0, 255, 0.3);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 9px 18px;
-            border-radius: var(--radius-md);
-            font-family: var(--font-body);
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: var(--transition-smooth);
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        .btn-primary {
-            background: var(--neon-cyan);
-            color: #000;
-            font-weight: 600;
-            border-color: var(--neon-cyan);
-        }
-        .btn-primary:hover {
-            box-shadow: 0 0 24px var(--neon-cyan-glow);
-            transform: translateY(-1px);
-        }
-        .btn-outline {
-            background: transparent;
-            color: var(--neon-cyan);
-            border-color: var(--border-neon);
-        }
-        .btn-outline:hover {
-            background: var(--neon-cyan-dim);
-            box-shadow: 0 0 16px var(--neon-cyan-glow);
-        }
-        .btn-sm {
-            padding: 5px 12px;
-            font-size: 0.75rem;
-            border-radius: var(--radius-sm);
-        }
-        .btn-danger {
-            background: transparent;
-            color: #ff5555;
-            border-color: rgba(255, 85, 85, 0.4);
-        }
-        .btn-danger:hover {
-            background: rgba(255, 85, 85, 0.12);
-            box-shadow: 0 0 14px rgba(255, 85, 85, 0.3);
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.82rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            letter-spacing: 0.02em;
-        }
-        .form-input,
-        .form-textarea {
-            width: 100%;
-            padding: 10px 14px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            color: var(--text-primary);
-            font-family: var(--font-body);
-            font-size: 0.9rem;
-            transition: var(--transition-smooth);
-            resize: vertical;
-        }
-        .form-input:focus,
-        .form-textarea:focus {
-            outline: none;
-            border-color: var(--neon-cyan-glow);
-            box-shadow: 0 0 14px rgba(0, 255, 204, 0.2);
-            background: #161616;
-        }
-        .form-textarea {
-            min-height: 100px;
-            font-family: var(--font-body);
-        }
-        .form-hint {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(4px);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .modal-dialog {
-            background: var(--bg-card);
-            border: 1px solid var(--border-neon);
-            border-radius: var(--radius-lg);
-            padding: 28px 24px;
-            width: 92%;
-            max-width: 520px;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 0 50px rgba(0, 255, 204, 0.2);
-            animation: fadeInUp 0.3s ease;
-            position: relative;
-        }
-        .modal-dialog h2 {
-            font-family: var(--font-heading);
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 18px;
-            color: #fff;
-            letter-spacing: 0.04em;
-        }
-        .modal-close {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.4rem;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-close:hover {
-            color: #ff5555;
-            background: rgba(255, 85, 85, 0.1);
-        }
-        .modal-tabs {
-            display: flex;
-            gap: 0;
-            margin-bottom: 18px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        .modal-tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            border-bottom: 2px solid transparent;
-            transition: var(--transition-fast);
-            background: none;
-            border-top: none;
-            border-left: none;
-            border-right: none;
-            font-family: var(--font-body);
-        }
-        .modal-tab.active {
-            color: var(--neon-cyan);
-            border-bottom-color: var(--neon-cyan);
-        }
-        .modal-tab:hover {
-            color: #fff;
-        }
-
-        .message-thread {
-            margin-left: 0;
-            border-left: 2px solid var(--border-subtle);
-            padding-left: 16px;
-            margin-top: 8px;
-        }
-        .message-thread .message-thread {
-            margin-left: 20px;
-            border-left-color: rgba(255, 0, 255, 0.2);
-        }
-        .message-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
-            margin-bottom: 8px;
-            transition: var(--transition-smooth);
-        }
-        .message-item:hover {
-            border-color: var(--border-neon);
-            box-shadow: 0 2px 12px rgba(0, 255, 204, 0.06);
-        }
-        .message-author {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--neon-cyan);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .message-time {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
-        .message-body {
-            margin-top: 8px;
-            font-size: 0.9rem;
-            line-height: 1.55;
-            word-break: break-word;
-        }
-        .message-body img,
-        .message-body video {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: var(--radius-md);
-            margin: 8px 0;
-            cursor: pointer;
-            border: 1px solid var(--border-subtle);
-            transition: var(--transition-smooth);
-        }
-        .message-body img:hover,
-        .message-body video:hover {
-            border-color: var(--neon-cyan-glow);
-            box-shadow: 0 0 16px rgba(0, 255, 204, 0.25);
-        }
-        .attachment-preview {
-            display: inline-block;
-            max-width: 200px;
-            max-height: 150px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            border: 1px solid var(--border-subtle);
-            margin: 4px;
-            transition: var(--transition-smooth);
-            object-fit: cover;
-        }
-        .attachment-preview:hover {
-            border-color: var(--neon-cyan-glow);
-            box-shadow: 0 0 12px rgba(0, 255, 204, 0.3);
-        }
-        .reply-btn {
-            font-size: 0.72rem;
-            padding: 4px 10px;
-            margin-top: 6px;
-            cursor: pointer;
-            background: transparent;
-            border: 1px solid var(--border-subtle);
-            color: var(--text-muted);
-            border-radius: var(--radius-sm);
-            transition: var(--transition-fast);
-            font-family: var(--font-body);
-        }
-        .reply-btn:hover {
-            border-color: var(--neon-cyan-glow);
-            color: var(--neon-cyan);
-        }
-        .quote-block {
-            background: rgba(0, 255, 204, 0.04);
-            border-left: 3px solid var(--neon-cyan-glow);
-            padding: 8px 12px;
-            margin: 8px 0;
-            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-        }
-
-        .pagination {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        .pagination button {
-            padding: 7px 14px;
-            border-radius: var(--radius-md);
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-family: var(--font-body);
-            font-size: 0.82rem;
-            transition: var(--transition-fast);
-        }
-        .pagination button:hover {
-            border-color: var(--neon-cyan-glow);
-            color: var(--neon-cyan);
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
-        }
-        .pagination button.active-page {
-            background: var(--neon-cyan);
-            color: #000;
-            border-color: var(--neon-cyan);
-            font-weight: 600;
-        }
-        .pagination button:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        .search-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .search-bar .form-input {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-        .profile-avatar {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--neon-cyan-glow);
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.25);
-            flex-shrink: 0;
-        }
-        .profile-avatar-placeholder {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: var(--neon-cyan-dim);
-            border: 2px solid var(--neon-cyan-glow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: var(--neon-cyan);
-            flex-shrink: 0;
-        }
-        .profile-info h2 {
-            font-family: var(--font-heading);
-            font-size: 1.6rem;
-            color: #fff;
-            letter-spacing: 0.04em;
-        }
-        .profile-stats {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-top: 6px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state .icon {
-            font-size: 3rem;
-            display: block;
-            margin-bottom: 12px;
-        }
-        .empty-state h3 {
-            font-family: var(--font-heading);
-            font-size: 1.3rem;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        @media (max-width: 768px) {
-            .header-inner {
-                flex-wrap: wrap;
-                height: auto;
-                padding: 8px 12px;
-                gap: 6px;
-            }
-            #header {
-                height: auto;
-                position: relative;
-            }
-            #nav-links {
-                order: 3;
-                width: 100%;
-                justify-content: center;
-                gap: 2px;
-            }
-            #nav-links li a,
-            #nav-links li button {
-                padding: 6px 10px;
-                font-size: 0.76rem;
-            }
-            .logo-area { order: 1; }
-            .user-area { order: 2; margin-left: auto; }
-            .card { padding: 14px 16px; }
-            .card-title { font-size: 1.05rem; }
-            .modal-dialog { width: 96%; padding: 20px 16px; }
-        }
-        @media (max-width: 480px) {
-            #nav-links li a,
-            #nav-links li button {
-                padding: 5px 7px;
-                font-size: 0.7rem;
-                gap: 2px;
-            }
-            .logo-text { font-size: 1.2rem; }
-            .logo-img { height: 28px; max-width: 100px; }
-            .btn { padding: 7px 12px; font-size: 0.78rem; }
-            .profile-avatar,
-            .profile-avatar-placeholder { width: 60px; height: 60px; font-size: 1.4rem; }
-        }
-
-        .hidden { display: none !important; }
-        .text-cyan { color: var(--neon-cyan); }
-        .text-magenta { color: var(--neon-magenta); }
-        .text-muted { color: var(--text-muted); }
-        .mt-8 { margin-top: 8px; }
-        .mt-16 { margin-top: 16px; }
-        .mb-16 { margin-bottom: 16px; }
-        .gap-8 { gap: 8px; }
-        .flex-row { display: flex; align-items: center; flex-wrap: wrap; }
-    </style>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #00ff66;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      border: 1px solid #00ff66;
+      min-height: 100vh;
+    }
+    h1 {
+      text-align: center;
+      letter-spacing: 4px;
+      text-shadow: 0 0 10px #00ff66;
+      margin-bottom: 20px;
+      font-size: 2.5em;
+    }
+    .auth {
+      text-align: right;
+      margin-bottom: 15px;
+    }
+    button, .auth button, .login-form button {
+      background: transparent;
+      color: #00ff66;
+      border: 1px solid #00ff66;
+      padding: 6px 16px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: 1px;
+      transition: 0.3s;
+      margin: 2px;
+    }
+    button:hover {
+      background: #00ff66;
+      color: #0a0a0a;
+    }
+    .new-topic {
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .new-topic input, .new-topic textarea, .login-form input {
+      flex: 1;
+      background: #0a0a0a;
+      border: 1px solid #00ff66;
+      color: #00ff66;
+      padding: 8px;
+      font-family: inherit;
+      outline: none;
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    .topic-list, .comments {
+      list-style: none;
+    }
+    .topic-item, .comment-item {
+      border: 1px solid #005522;
+      margin: 5px 0;
+      padding: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .topic-item:hover { background: #112211; }
+    .topic-title { font-weight: bold; font-size: 1.1em; }
+    .meta { font-size: 0.8em; color: #009944; }
+    .comment-author {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #004422;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+    }
+    .back-btn { margin: 15px 0; }
+    .hidden { display: none; }
+    .error { color: #ff4444; border-color: #ff4444; }
+    hr { border-color:#004422; }
+    a { color: #00ff66; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .login-form {
+      background: #0a0a0a;
+      border: 1px solid #00ff66;
+      padding: 15px;
+      margin: 10px 0;
+    }
+    .login-form h3 { margin-bottom: 10px; }
+    .login-buttons { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .signup-link { font-size: 0.8em; margin-top: 8px; cursor: pointer; text-decoration: underline; }
+  </style>
 </head>
 <body>
-
-    <header id="header">
-        <div class="header-inner">
-            <div class="logo-area" id="logoArea" title="FusionGate — на главную">
-                <span class="logo-text" id="logoText">FusionGate</span>
-                <img class="logo-img hidden" id="logoImg" src="" alt="FusionGate Logo">
-            </div>
-            <button class="logo-upload-btn" id="btnUploadLogo" title="Загрузить логотип форума">🖼 Лого</button>
-            <button class="logo-upload-btn delete-logo hidden" id="btnDeleteLogo" title="Удалить логотип">✕</button>
-
-            <ul id="nav-links">
-                <li><a href="#" data-view="topics" class="active">📋 Темы</a></li>
-                <li><a href="#" data-view="search">🔍 Поиск</a></li>
-                <li><button id="btnNewTopic" class="btn-outline btn-sm">＋ Новая тема</button></li>
-            </ul>
-
-            <div class="user-area" id="userArea">
-                <span id="guestButtons">
-                    <button class="btn btn-login" id="btnShowAuth">🔐 Войти</button>
-                </span>
-                <span id="userInfo" class="hidden">
-                    <span class="user-greeting" id="userGreeting" title="Профиль">
-                        <span id="userAvatarMini"></span>
-                        <span id="userNameDisplay"></span>
-                    </span>
-                    <button class="btn btn-logout btn-sm" id="btnLogout">Выйти</button>
-                </span>
-            </div>
-        </div>
-    </header>
-
-    <main id="main-content">
-        <div id="viewContainer"></div>
-    </main>
-
-    <div id="modalsContainer"></div>
-
-    <input type="file" id="hiddenLogoInput" accept="image/*" class="hidden">
-    <input type="file" id="hiddenAvatarInput" accept="image/*" class="hidden">
-    <input type="file" id="hiddenAttachmentInput" accept="image/*,video/mp4,video/webm" class="hidden" multiple>
-
-    <footer style="text-align:center;padding:16px;font-size:0.7rem;color:var(--text-muted);border-top:1px solid var(--border-subtle);">
-        <span>FusionGate © 2026</span>
-        <span style="margin:0 8px;">|</span>
-        <span>⚡ Powered by localStorage</span>
-    </footer>
-
-    <script>
-        (function() {
-            // ============================================================
-            //  КОНСТАНТЫ И КЛЮЧИ localStorage
-            // ============================================================
-            const PREFIX = 'fg_';
-            const KEYS = {
-                USERS: PREFIX + 'users',
-                TOPICS: PREFIX + 'topics',
-                MESSAGES: PREFIX + 'messages',
-                SESSION: PREFIX + 'session',
-                LOGO: PREFIX + 'logo',
-                NEXT_IDS: PREFIX + 'nextIds'
-            };
-            const TOPICS_PER_PAGE = 15;
-
-            function getData(key) {
-                try {
-                    const raw = localStorage.getItem(key);
-                    return raw ? JSON.parse(raw) : null;
-                } catch (e) {
-                    console.error('Ошибка чтения из localStorage:', key, e);
-                    return null;
-                }
-            }
-
-            function setData(key, value) {
-                try {
-                    localStorage.setItem(key, JSON.stringify(value));
-                } catch (e) {
-                    console.error('Ошибка записи в localStorage:', key, e);
-                    alert('Ошибка сохранения данных. Возможно, переполнено хранилище браузера.');
-                }
-            }
-
-            function getNextId(entityType) {
-                const ids = getData(KEYS.NEXT_IDS) || { users: 1, topics: 1, messages: 1 };
-                const id = ids[entityType] || 1;
-                ids[entityType] = id + 1;
-                setData(KEYS.NEXT_IDS, ids);
-                return id;
-            }
-
-            function initStorage() {
-                if (!getData(KEYS.USERS)) setData(KEYS.USERS, []);
-                if (!getData(KEYS.TOPICS)) setData(KEYS.TOPICS, []);
-                if (!getData(KEYS.MESSAGES)) setData(KEYS.MESSAGES, []);
-                if (!getData(KEYS.NEXT_IDS)) setData(KEYS.NEXT_IDS, { users: 1, topics: 1, messages: 1 });
-                if (getData(KEYS.SESSION) === undefined || getData(KEYS.SESSION) === null) {
-                    setData(KEYS.SESSION, null);
-                }
-            }
-
-            async function hashPassword(password) {
-                const encoder = new TextEncoder();
-                const data = encoder.encode(password);
-                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            }
-
-            function getSession() {
-                return getData(KEYS.SESSION);
-            }
-
-            function setSession(session) {
-                setData(KEYS.SESSION, session);
-            }
-
-            function clearSession() {
-                setData(KEYS.SESSION, null);
-            }
-
-            function isLoggedIn() {
-                const session = getSession();
-                return session && session.userId;
-            }
-
-            function getCurrentUserId() {
-                const session = getSession();
-                return session ? session.userId : null;
-            }
-
-            function getCurrentUser() {
-                const session = getSession();
-                if (!session || !session.userId) return null;
-                const users = getData(KEYS.USERS) || [];
-                return users.find(u => u.id === session.userId) || null;
-            }
-
-            async function registerUser(username, password) {
-                const users = getData(KEYS.USERS) || [];
-                if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
-                    return { success: false, error: 'Пользователь с таким ником уже существует.' };
-                }
-                if (username.trim().length < 2) {
-                    return { success: false, error: 'Ник должен содержать минимум 2 символа.' };
-                }
-                if (password.length < 3) {
-                    return { success: false, error: 'Пароль должен содержать минимум 3 символа.' };
-                }
-                const passwordHash = await hashPassword(password);
-                const newUser = {
-                    id: getNextId('users'),
-                    username: username.trim(),
-                    passwordHash: passwordHash,
-                    avatar: null,
-                    bio: '',
-                    createdAt: new Date().toISOString(),
-                    topicCount: 0,
-                    messageCount: 0
-                };
-                users.push(newUser);
-                setData(KEYS.USERS, users);
-                setSession({ userId: newUser.id, username: newUser.username });
-                return { success: true, user: newUser };
-            }
-
-            async function loginUser(username, password) {
-                const users = getData(KEYS.USERS) || [];
-                const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
-                if (!user) {
-                    return { success: false, error: 'Пользователь с таким ником не найден.' };
-                }
-                const passwordHash = await hashPassword(password);
-                if (user.passwordHash !== passwordHash) {
-                    return { success: false, error: 'Неверный пароль.' };
-                }
-                setSession({ userId: user.id, username: user.username });
-                return { success: true, user: user };
-            }
-
-            function logoutUser() {
-                clearSession();
-            }
-
-            function updateUserProfile(userId, updates) {
-                const users = getData(KEYS.USERS) || [];
-                const index = users.findIndex(u => u.id === userId);
-                if (index === -1) return false;
-                const allowedKeys = ['avatar', 'bio'];
-                for (const key of allowedKeys) {
-                    if (updates[key] !== undefined) {
-                        users[index][key] = updates[key];
-                    }
-                }
-                if (updates.username && updates.username.trim().length >= 2) {
-                    const trimmed = updates.username.trim();
-                    if (!users.some(u => u.username.toLowerCase() === trimmed.toLowerCase() && u.id !== userId)) {
-                        users[index].username = trimmed;
-                        const session = getSession();
-                        if (session && session.userId === userId) {
-                            session.username = trimmed;
-                            setSession(session);
-                        }
-                    }
-                }
-                setData(KEYS.USERS, users);
-                return true;
-            }
-
-            function incrementUserTopicCount(userId) {
-                const users = getData(KEYS.USERS) || [];
-                const user = users.find(u => u.id === userId);
-                if (user) {
-                    user.topicCount = (user.topicCount || 0) + 1;
-                    setData(KEYS.USERS, users);
-                }
-            }
-
-            function incrementUserMessageCount(userId) {
-                const users = getData(KEYS.USERS) || [];
-                const user = users.find(u => u.id === userId);
-                if (user) {
-                    user.messageCount = (user.messageCount || 0) + 1;
-                    setData(KEYS.USERS, users);
-                }
-            }
-
-            function getUserById(userId) {
-                const users = getData(KEYS.USERS) || [];
-                return users.find(u => u.id === userId) || null;
-            }
-
-            function getLogo() {
-                return localStorage.getItem(KEYS.LOGO) || null;
-            }
-
-            function setLogo(base64) {
-                localStorage.setItem(KEYS.LOGO, base64);
-            }
-
-            function removeLogo() {
-                localStorage.removeItem(KEYS.LOGO);
-            }
-
-            function fileToBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = () => reject(new Error('Ошибка чтения файла'));
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            function validateFileSize(file, maxMB = 2) {
-                const maxBytes = maxMB * 1024 * 1024;
-                if (file.size > maxBytes) {
-                    return { valid: false, error: `Файл «${file.name}» превышает лимит ${maxMB} МБ (размер: ${(file.size / 1024 / 1024).toFixed(2)} МБ).` };
-                }
-                return { valid: true };
-            }
-
-            function isImageFile(file) { return file.type.startsWith('image/'); }
-            function isVideoFile(file) { return file.type.startsWith('video/'); }
-            function isImageURL(url) { return /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url) || url.startsWith('data:image/'); }
-            function isVideoURL(url) { return /\.(mp4|webm)(\?.*)?$/i.test(url) || url.startsWith('data:video/'); }
-
-            function escapeHTML(str) {
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
-
-            function sanitizeText(str) {
-                return escapeHTML(str).replace(/\n/g, '<br>');
-            }
-
-            function formatDate(isoString) {
-                const d = new Date(isoString);
-                const now = new Date();
-                const diff = now - d;
-                if (diff < 60000) return 'только что';
-                if (diff < 3600000) return `${Math.floor(diff / 60000)} мин. назад`;
-                if (diff < 86400000) return `${Math.floor(diff / 3600000)} ч. назад`;
-                if (diff < 604800000) return `${Math.floor(diff / 86400000)} дн. назад`;
-                return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) +
-                    ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-            }
-
-            function createModal(modalId, contentHTML) {
-                const overlay = document.createElement('div');
-                overlay.className = 'modal-overlay';
-                overlay.id = modalId;
-                overlay.innerHTML = `
-                    <div class="modal-dialog">
-                        <button class="modal-close" data-close="${modalId}">✕</button>
-                        ${contentHTML}
-                    </div>
-                `;
-                overlay.addEventListener('click', function(e) {
-                    if (e.target === overlay) closeModal(modalId);
-                });
-                overlay.querySelector('.modal-close').addEventListener('click', () => closeModal(modalId));
-                return overlay;
-            }
-
-            function openModal(modalId, contentHTML) {
-                const existing = document.getElementById(modalId);
-                if (existing) existing.remove();
-                const modal = createModal(modalId, contentHTML);
-                document.getElementById('modalsContainer').appendChild(modal);
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeModal(modalId) {
-                const modal = document.getElementById(modalId);
-                if (modal) modal.remove();
-                if (document.getElementById('modalsContainer').children.length === 0) {
-                    document.body.style.overflow = '';
-                }
-            }
-
-            function closeAllModals() {
-                document.getElementById('modalsContainer').innerHTML = '';
-                document.body.style.overflow = '';
-            }
-
-            function openFullscreenView(src, type) {
-                const modalId = 'fullscreenView';
-                let mediaHTML;
-                if (type === 'video') {
-                    mediaHTML = `<video src="${src}" controls autoplay style="max-width:90vw;max-height:85vh;border-radius:8px;"></video>`;
-                } else {
-                    mediaHTML = `<img src="${src}" style="max-width:90vw;max-height:85vh;border-radius:8px;object-fit:contain;" alt="Полноэкранный просмотр">`;
-                }
-                openModal(modalId, `
-                    <div style="text-align:center;">
-                        ${mediaHTML}
-                        <div class="mt-8">
-                            <a href="${src}" download target="_blank" class="btn btn-outline btn-sm">📥 Скачать</a>
-                        </div>
-                    </div>
-                `);
-            }
-
-            function renderAttachments(attachments) {
-                if (!attachments || attachments.length === 0) return '';
-                let html = '<div class="flex-row gap-8" style="margin-top:8px;">';
-                for (const att of attachments) {
-                    const src = escapeHTML(att.url);
-                    const name = escapeHTML(att.name || 'вложение');
-                    if (att.type === 'image') {
-                        html += `<img src="${src}" alt="${name}" class="attachment-preview" onclick="event.stopPropagation();window._fg_openFullscreen('${src.replace(/'/g, "\\'")}', 'image')" loading="lazy" title="${name}">`;
-                    } else if (att.type === 'video') {
-                        html += `<video src="${src}" class="attachment-preview" muted preload="metadata" onclick="event.stopPropagation();window._fg_openFullscreen('${src.replace(/'/g, "\\'")}', 'video')" title="${name}"></video>`;
-                    }
-                }
-                html += '</div>';
-                return html;
-            }
-            window._fg_openFullscreen = openFullscreenView;
-
-            initStorage();
-
-            let currentView = 'topics';
-            let currentTopicPage = 1;
-            let currentSearchQuery = '';
-            let currentProfileUserId = null;
-            let currentTopicId = null;
-
-            function renderHeader() {
-                const logo = getLogo();
-                const logoImg = document.getElementById('logoImg');
-                const logoText = document.getElementById('logoText');
-                const btnDeleteLogo = document.getElementById('btnDeleteLogo');
-                const btnUploadLogo = document.getElementById('btnUploadLogo');
-
-                if (logo) {
-                    logoImg.src = logo;
-                    logoImg.classList.remove('hidden');
-                    logoText.classList.add('hidden');
-                    btnDeleteLogo.classList.remove('hidden');
-                    btnUploadLogo.textContent = '🖼 Сменить';
-                } else {
-                    logoImg.classList.add('hidden');
-                    logoText.classList.remove('hidden');
-                    btnDeleteLogo.classList.add('hidden');
-                    btnUploadLogo.textContent = '🖼 Лого';
-                }
-
-                const guestButtons = document.getElementById('guestButtons');
-                const userInfo = document.getElementById('userInfo');
-                const userNameDisplay = document.getElementById('userNameDisplay');
-                const userAvatarMini = document.getElementById('userAvatarMini');
-                const btnNewTopic = document.getElementById('btnNewTopic');
-
-                if (isLoggedIn()) {
-                    const user = getCurrentUser();
-                    guestButtons.classList.add('hidden');
-                    userInfo.classList.remove('hidden');
-                    userNameDisplay.textContent = user ? user.username : '';
-                    if (user && user.avatar) {
-                        userAvatarMini.innerHTML = `<img src="${escapeHTML(user.avatar)}" class="user-avatar-mini" alt="Avatar">`;
-                    } else {
-                        userAvatarMini.innerHTML = '<span class="user-avatar-placeholder">👤</span>';
-                    }
-                    btnNewTopic.classList.remove('hidden');
-                } else {
-                    guestButtons.classList.remove('hidden');
-                    userInfo.classList.add('hidden');
-                    btnNewTopic.classList.add('hidden');
-                }
-            }
-
-            function navigateTo(view, data = null) {
-                currentView = view;
-                document.querySelectorAll('#nav-links a').forEach(a => a.classList.remove('active'));
-                const activeLink = document.querySelector(`#nav-links a[data-view="${view}"]`);
-                if (activeLink) activeLink.classList.add('active');
-
-                switch (view) {
-                    case 'topics':
-                        currentTopicPage = data && data.page ? data.page : 1;
-                        renderTopicsList();
-                        break;
-                    case 'topic':
-                        currentTopicId = data && data.topicId ? data.topicId : null;
-                        renderTopicView();
-                        break;
-                    case 'search':
-                        currentSearchQuery = data && data.query ? data.query : '';
-                        renderSearchView();
-                        break;
-                    case 'profile':
-                        currentProfileUserId = data && data.userId ? data.userId : getCurrentUserId();
-                        renderProfileView();
-                        break;
-                    default:
-                        renderTopicsList();
-                }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                renderHeader();
-            }
-
-            function renderTopicsList() {
-                const container = document.getElementById('viewContainer');
-                const topics = getData(KEYS.TOPICS) || [];
-                const sortedTopics = [...topics].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                const totalPages = Math.max(1, Math.ceil(sortedTopics.length / TOPICS_PER_PAGE));
-                if (currentTopicPage > totalPages) currentTopicPage = totalPages;
-                const start = (currentTopicPage - 1) * TOPICS_PER_PAGE;
-                const pageTopics = sortedTopics.slice(start, start + TOPICS_PER_PAGE);
-
-                let html = '<h1 style="font-family:var(--font-heading);font-size:1.8rem;margin-bottom:16px;letter-spacing:0.04em;">📋 Темы форума</h1>';
-
-                if (isLoggedIn()) {
-                    html += `<button class="btn btn-primary mb-16" id="btnCreateTopicTop" style="margin-bottom:16px;">＋ Создать новую тему</button>`;
-                }
-
-                if (pageTopics.length === 0) {
-                    html += `<div class="empty-state"><span class="icon">💬</span><h3>Тем пока нет</h3><p>Будьте первым, кто создаст тему на форуме!</p></div>`;
-                } else {
-                    for (const topic of pageTopics) {
-                        const author = getUserById(topic.authorId);
-                        const authorName = author ? escapeHTML(author.username) : 'Неизвестный';
-                        const msgCount = topic.messageCount || 0;
-                        html += `
-                            <div class="card topic-card" data-topic-id="${topic.id}" style="cursor:pointer;">
-                                <div class="card-header">
-                                    <span class="card-title">${escapeHTML(topic.title)}</span>
-                                    <span class="badge badge-cyan">${msgCount} ✉</span>
-                                </div>
-                                <div class="card-meta">
-                                    <span>👤 ${authorName}</span>
-                                    <span>🕐 ${formatDate(topic.createdAt)}</span>
-                                </div>
-                            </div>`;
-                    }
-                }
-
-                if (totalPages > 1) {
-                    html += '<div class="pagination">';
-                    html += `<button ${currentTopicPage === 1 ? 'disabled' : ''} data-page="${currentTopicPage - 1}">◀ Назад</button>`;
-                    for (let p = 1; p <= totalPages; p++) {
-                        html += `<button class="${p === currentTopicPage ? 'active-page' : ''}" data-page="${p}">${p}</button>`;
-                    }
-                    html += `<button ${currentTopicPage === totalPages ? 'disabled' : ''} data-page="${currentTopicPage + 1}">Вперёд ▶</button>`;
-                    html += '</div>';
-                }
-
-                container.innerHTML = html;
-
-                container.querySelectorAll('.topic-card').forEach(card => {
-                    card.addEventListener('click', function() {
-                        navigateTo('topic', { topicId: parseInt(this.dataset.topicId) });
-                    });
-                });
-                container.querySelectorAll('.pagination button[data-page]').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        currentTopicPage = parseInt(this.dataset.page);
-                        renderTopicsList();
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    });
-                });
-                const btnCreate = container.querySelector('#btnCreateTopicTop');
-                if (btnCreate) btnCreate.addEventListener('click', openCreateTopicModal);
-            }
-
-            function openAuthModal(tab = 'login') {
-                const modalId = 'authModal';
-                const contentHTML = `
-                    <h2>🔐 Доступ к FusionGate</h2>
-                    <div class="modal-tabs">
-                        <button class="modal-tab ${tab === 'login' ? 'active' : ''}" data-tab="login">Вход</button>
-                        <button class="modal-tab ${tab === 'register' ? 'active' : ''}" data-tab="register">Регистрация</button>
-                    </div>
-                    <div id="authFormContainer"></div>
-                    <div id="authError" class="text-muted mt-8" style="color:#ff6666!important;min-height:20px;"></div>
-                `;
-                openModal(modalId, contentHTML);
-                renderAuthForm(tab);
-
-                const modalEl = document.getElementById(modalId);
-                modalEl.querySelectorAll('.modal-tab').forEach(tabBtn => {
-                    tabBtn.addEventListener('click', function() {
-                        const newTab = this.dataset.tab;
-                        modalEl.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
-                        this.classList.add('active');
-                        renderAuthForm(newTab);
-                        document.getElementById('authError').textContent = '';
-                    });
-                });
-            }
-
-            function renderAuthForm(tab) {
-                const container = document.getElementById('authFormContainer');
-                if (!container) return;
-                if (tab === 'login') {
-                    container.innerHTML = `
-                        <div class="form-group">
-                            <label>Никнейм</label>
-                            <input type="text" class="form-input" id="loginUsername" placeholder="Введите ник" autocomplete="username">
-                        </div>
-                        <div class="form-group">
-                            <label>Пароль</label>
-                            <input type="password" class="form-input" id="loginPassword" placeholder="Введите пароль" autocomplete="current-password">
-                        </div>
-                        <button class="btn btn-primary" id="btnLogin" style="width:100%;">Войти</button>
-                    `;
-                    document.getElementById('btnLogin').addEventListener('click', handleLogin);
-                    document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
-                } else {
-                    container.innerHTML = `
-                        <div class="form-group">
-                            <label>Никнейм</label>
-                            <input type="text" class="form-input" id="regUsername" placeholder="Придумайте ник" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            <label>Пароль</label>
-                            <input type="password" class="form-input" id="regPassword" placeholder="Придумайте пароль (мин. 3 символа)" autocomplete="new-password">
-                        </div>
-                        <div class="form-group">
-                            <label>Подтверждение пароля</label>
-                            <input type="password" class="form-input" id="regPasswordConfirm" placeholder="Повторите пароль" autocomplete="new-password">
-                        </div>
-                        <button class="btn btn-primary" id="btnRegister" style="width:100%;">Зарегистрироваться</button>
-                    `;
-                    document.getElementById('btnRegister').addEventListener('click', handleRegister);
-                    document.getElementById('regPasswordConfirm').addEventListener('keydown', e => { if (e.key === 'Enter') handleRegister(); });
-                }
-            }
-
-            async function handleLogin() {
-                const username = document.getElementById('loginUsername').value.trim();
-                const password = document.getElementById('loginPassword').value;
-                const errorEl = document.getElementById('authError');
-                if (!username || !password) { errorEl.textContent = 'Заполните все поля.'; return; }
-                const result = await loginUser(username, password);
-                if (result.success) {
-                    closeModal('authModal');
-                    renderHeader();
-                    navigateTo('topics');
-                } else {
-                    errorEl.textContent = result.error;
-                }
-            }
-
-            async function handleRegister() {
-                const username = document.getElementById('regUsername').value.trim();
-                const password = document.getElementById('regPassword').value;
-                const confirm = document.getElementById('regPasswordConfirm').value;
-                const errorEl = document.getElementById('authError');
-                if (!username || !password || !confirm) { errorEl.textContent = 'Заполните все поля.'; return; }
-                if (password !== confirm) { errorEl.textContent = 'Пароли не совпадают.'; return; }
-                const result = await registerUser(username, password);
-                if (result.success) {
-                    closeModal('authModal');
-                    renderHeader();
-                    navigateTo('topics');
-                } else {
-                    errorEl.textContent = result.error;
-                }
-            }
-
-            function openCreateTopicModal() {
-                if (!isLoggedIn()) { openAuthModal('login'); return; }
-                const modalId = 'createTopicModal';
-                const contentHTML = `
-                    <h2>📝 Новая тема</h2>
-                    <div class="form-group">
-                        <label>Заголовок темы</label>
-                        <input type="text" class="form-input" id="newTopicTitle" placeholder="Введите заголовок" maxlength="200">
-                    </div>
-                    <div class="form-group">
-                        <label>Первое сообщение</label>
-                        <textarea class="form-textarea" id="newTopicContent" placeholder="Текст сообщения..." rows="5"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Вложения (URL или файлы)</label>
-                        <input type="text" class="form-input mt-8" id="newTopicUrl" placeholder="Вставьте ссылку на изображение или видео">
-                        <div class="flex-row gap-8 mt-8">
-                            <button class="btn btn-outline btn-sm" id="btnAddAttachmentTopic">📎 Загрузить файл</button>
-                            <span class="form-hint" id="topicAttachmentHint"></span>
-                        </div>
-                        <div id="topicAttachmentPreview" class="flex-row gap-8 mt-8"></div>
-                    </div>
-                    <div id="createTopicError" class="text-muted mt-8" style="color:#ff6666!important;min-height:20px;"></div>
-                    <button class="btn btn-primary mt-8" id="btnSubmitTopic" style="width:100%;">Опубликовать тему</button>
-                `;
-                openModal(modalId, contentHTML);
-
-                let tempAttachments = [];
-
-                document.getElementById('btnSubmitTopic').addEventListener('click', async function() {
-                    const title = document.getElementById('newTopicTitle').value.trim();
-                    const content = document.getElementById('newTopicContent').value.trim();
-                    const urlInput = document.getElementById('newTopicUrl').value.trim();
-                    const errorEl = document.getElementById('createTopicError');
-
-                    if (!title) { errorEl.textContent = 'Введите заголовок темы.'; return; }
-                    if (!content && tempAttachments.length === 0 && !urlInput) {
-                        errorEl.textContent = 'Введите текст сообщения или добавьте вложение.';
-                        return;
-                    }
-
-                    let allAttachments = [...tempAttachments];
-                    if (urlInput) {
-                        if (isImageURL(urlInput)) allAttachments.push({ type: 'image', url: urlInput, name: 'image_url' });
-                        else if (isVideoURL(urlInput)) allAttachments.push({ type: 'video', url: urlInput, name: 'video_url' });
-                        else allAttachments.push({ type: 'link', url: urlInput, name: 'link' });
-                    }
-
-                    const topicId = createTopic(title, content, allAttachments);
-                    if (topicId) {
-                        closeModal(modalId);
-                        navigateTo('topic', { topicId });
-                    } else {
-                        errorEl.textContent = 'Ошибка при создании темы.';
-                    }
-                });
-
-                document.getElementById('btnAddAttachmentTopic').addEventListener('click', function() {
-                    const input = document.getElementById('hiddenAttachmentInput');
-                    input.click();
-                    input.onchange = async function() {
-                        const files = Array.from(input.files);
-                        const previewDiv = document.getElementById('topicAttachmentPreview');
-                        const hintEl = document.getElementById('topicAttachmentHint');
-                        for (const file of files) {
-                            const sizeCheck = validateFileSize(file, 2);
-                            if (!sizeCheck.valid) { hintEl.textContent = sizeCheck.error; continue; }
-                            try {
-                                const base64 = await fileToBase64(file);
-                                const type = isImageFile(file) ? 'image' : (isVideoFile(file) ? 'video' : 'file');
-                                tempAttachments.push({ type, url: base64, name: file.name });
-                                if (type === 'image') {
-                                    previewDiv.innerHTML += `<img src="${base64}" class="attachment-preview" style="max-width:80px;max-height:60px;" title="${escapeHTML(file.name)}">`;
-                                } else if (type === 'video') {
-                                    previewDiv.innerHTML += `<video src="${base64}" class="attachment-preview" style="max-width:80px;max-height:60px;" muted title="${escapeHTML(file.name)}"></video>`;
-                                }
-                                hintEl.textContent = `Загружено: ${tempAttachments.length} файл(ов)`;
-                            } catch (e) {
-                                hintEl.textContent = 'Ошибка загрузки файла.';
-                            }
-                        }
-                        input.value = '';
-                    };
-                });
-            }
-
-            function createTopic(title, content, attachments) {
-                if (!isLoggedIn()) return null;
-                const userId = getCurrentUserId();
-                const topics = getData(KEYS.TOPICS) || [];
-                const topicId = getNextId('topics');
-                const newTopic = {
-                    id: topicId,
-                    title: title,
-                    authorId: userId,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    messageCount: 1
-                };
-                topics.push(newTopic);
-                setData(KEYS.TOPICS, topics);
-                incrementUserTopicCount(userId);
-
-                const messages = getData(KEYS.MESSAGES) || [];
-                const messageId = getNextId('messages');
-                const newMessage = {
-                    id: messageId,
-                    topicId: topicId,
-                    authorId: userId,
-                    body: content,
-                    attachments: attachments || [],
-                    parentId: null,
-                    createdAt: new Date().toISOString()
-                };
-                messages.push(newMessage);
-                setData(KEYS.MESSAGES, messages);
-                incrementUserMessageCount(userId);
-                return topicId;
-            }
-
-            function getTopicById(topicId) {
-                const topics = getData(KEYS.TOPICS) || [];
-                return topics.find(t => t.id === topicId) || null;
-            }
-
-            function getMessagesForTopic(topicId) {
-                const messages = getData(KEYS.MESSAGES) || [];
-                return messages.filter(m => m.topicId === topicId).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-            }
-
-            function buildMessageTree(messages) {
-                const map = {};
-                const roots = [];
-                for (const msg of messages) {
-                    map[msg.id] = { ...msg, children: [] };
-                }
-                for (const msg of Object.values(map)) {
-                    if (msg.parentId && map[msg.parentId]) {
-                        map[msg.parentId].children.push(msg);
-                    } else {
-                        roots.push(msg);
-                    }
-                }
-                return roots;
-            }
-
-            function renderMessageTree(nodes, depth = 0) {
-                let html = '';
-                for (const node of nodes) {
-                    const author = getUserById(node.authorId);
-                    const authorName = author ? escapeHTML(author.username) : 'Неизвестный';
-                    const authorAvatar = author?.avatar ? `<img src="${escapeHTML(author.avatar)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;margin-right:4px;">` : '';
-                    const quoteHtml = node.parentId ? `<div class="quote-block">↪ В ответ на сообщение #${node.parentId}</div>` : '';
-                    html += `
-                        <div class="message-item" style="margin-left:${depth * 20}px;" data-message-id="${node.id}">
-                            <div class="message-author">
-                                ${authorAvatar} ${authorName}
-                                <span class="message-time">${formatDate(node.createdAt)}</span>
-                            </div>
-                            <div class="message-body">
-                                ${quoteHtml}
-                                ${sanitizeText(node.body)}
-                                ${renderAttachments(node.attachments)}
-                            </div>
-                            ${isLoggedIn() ? `<button class="reply-btn" data-reply-to="${node.id}">💬 Ответить</button>` : ''}
-                            <div class="message-thread" id="children-${node.id}">
-                                ${node.children.length > 0 ? renderMessageTree(node.children, depth + 1) : ''}
-                            </div>
-                        </div>`;
-                }
-                return html;
-            }
-
-            function renderTopicView() {
-                if (!currentTopicId) {
-                    navigateTo('topics');
-                    return;
-                }
-                const topic = getTopicById(currentTopicId);
-                if (!topic) {
-                    document.getElementById('viewContainer').innerHTML = '<div class="empty-state"><h3>Тема не найдена</h3></div>';
-                    return;
-                }
-                const messages = getMessagesForTopic(currentTopicId);
-                const tree = buildMessageTree(messages);
-                const author = getUserById(topic.authorId);
-                const authorName = author ? escapeHTML(author.username) : 'Неизвестный';
-
-                let html = `
-                    <div style="margin-bottom:16px;">
-                        <button class="btn btn-outline btn-sm" id="btnBackToTopics">◀ Назад к темам</button>
-                    </div>
-                    <div class="card" style="margin-bottom:20px;">
-                        <h1 style="font-family:var(--font-heading);font-size:1.8rem;margin-bottom:8px;">${escapeHTML(topic.title)}</h1>
-                        <div class="card-meta">
-                            <span>👤 ${authorName}</span>
-                            <span>🕐 ${formatDate(topic.createdAt)}</span>
-                            <span>✉ ${topic.messageCount || 0}</span>
-                        </div>
-                    </div>`;
-
-                html += '<div id="topicMessages">';
-                html += renderMessageTree(tree);
-                html += '</div>';
-
-                if (isLoggedIn()) {
-                    html += `
-                        <div class="card mt-16" id="replyFormCard">
-                            <h3 style="font-family:var(--font-heading);">✍️ Новое сообщение</h3>
-                            <div class="form-group">
-                                <textarea class="form-textarea" id="replyBody" placeholder="Текст сообщения..." rows="4"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Вложения (URL или файлы)</label>
-                                <input type="text" class="form-input" id="replyUrl" placeholder="Ссылка на изображение/видео">
-                                <div class="flex-row gap-8 mt-8">
-                                    <button class="btn btn-outline btn-sm" id="btnAddAttachmentReply">📎 Загрузить</button>
-                                    <span class="form-hint" id="replyAttachmentHint"></span>
-                                </div>
-                                <div id="replyAttachmentPreview" class="flex-row gap-8 mt-8"></div>
-                            </div>
-                            <div id="replyError" style="color:#ff6666!important;min-height:20px;" class="mt-8"></div>
-                            <button class="btn btn-primary mt-8" id="btnSubmitReply">Отправить</button>
-                            <input type="hidden" id="replyParentId" value="">
-                        </div>`;
-                }
-
-                document.getElementById('viewContainer').innerHTML = html;
-                document.getElementById('btnBackToTopics').addEventListener('click', () => navigateTo('topics'));
-
-                if (isLoggedIn()) {
-                    let tempReplyAttachments = [];
-                    document.getElementById('btnSubmitReply').addEventListener('click', function() {
-                        const body = document.getElementById('replyBody').value.trim();
-                        const urlInput = document.getElementById('replyUrl').value.trim();
-                        const parentId = parseInt(document.getElementById('replyParentId').value) || null;
-                        const errorEl = document.getElementById('replyError');
-
-                        if (!body && tempReplyAttachments.length === 0 && !urlInput) {
-                            errorEl.textContent = 'Введите текст сообщения или добавьте вложение.';
-                            return;
-                        }
-
-                        let allAttachments = [...tempReplyAttachments];
-                        if (urlInput) {
-                            if (isImageURL(urlInput)) allAttachments.push({ type: 'image', url: urlInput, name: 'image_url' });
-                            else if (isVideoURL(urlInput)) allAttachments.push({ type: 'video', url: urlInput, name: 'video_url' });
-                            else allAttachments.push({ type: 'link', url: urlInput, name: 'link' });
-                        }
-
-                        const messageId = createMessage(currentTopicId, body, allAttachments, parentId);
-                        if (messageId) {
-                            const topic = getTopicById(currentTopicId);
-                            if (topic) {
-                                topic.messageCount = (topic.messageCount || 0) + 1;
-                                topic.updatedAt = new Date().toISOString();
-                                const topics = getData(KEYS.TOPICS) || [];
-                                const idx = topics.findIndex(t => t.id === currentTopicId);
-                                if (idx !== -1) {
-                                    topics[idx] = topic;
-                                    setData(KEYS.TOPICS, topics);
-                                }
-                            }
-                            document.getElementById('replyBody').value = '';
-                            document.getElementById('replyUrl').value = '';
-                            document.getElementById('replyParentId').value = '';
-                            document.getElementById('replyAttachmentPreview').innerHTML = '';
-                            tempReplyAttachments = [];
-                            document.getElementById('replyError').textContent = '';
-                            renderTopicView();
-                        } else {
-                            errorEl.textContent = 'Ошибка при отправке сообщения.';
-                        }
-                    });
-
-                    document.getElementById('btnAddAttachmentReply').addEventListener('click', function() {
-                        const input = document.getElementById('hiddenAttachmentInput');
-                        input.click();
-                        input.onchange = async function() {
-                            const files = Array.from(input.files);
-                            const previewDiv = document.getElementById('replyAttachmentPreview');
-                            const hintEl = document.getElementById('replyAttachmentHint');
-                            for (const file of files) {
-                                const sizeCheck = validateFileSize(file, 2);
-                                if (!sizeCheck.valid) { hintEl.textContent = sizeCheck.error; continue; }
-                                try {
-                                    const base64 = await fileToBase64(file);
-                                    const type = isImageFile(file) ? 'image' : (isVideoFile(file) ? 'video' : 'file');
-                                    tempReplyAttachments.push({ type, url: base64, name: file.name });
-                                    if (type === 'image') {
-                                        previewDiv.innerHTML += `<img src="${base64}" class="attachment-preview" style="max-width:80px;max-height:60px;" title="${escapeHTML(file.name)}">`;
-                                    } else if (type === 'video') {
-                                        previewDiv.innerHTML += `<video src="${base64}" class="attachment-preview" style="max-width:80px;max-height:60px;" muted title="${escapeHTML(file.name)}"></video>`;
-                                    }
-                                    hintEl.textContent = `Загружено: ${tempReplyAttachments.length} файл(ов)`;
-                                } catch (e) {
-                                    hintEl.textContent = 'Ошибка загрузки.';
-                                }
-                            }
-                            input.value = '';
-                        };
-                    });
-
-                    document.querySelectorAll('.reply-btn').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const messageId = parseInt(this.dataset.replyTo);
-                            document.getElementById('replyParentId').value = messageId;
-                            document.getElementById('replyBody').focus();
-                            window.scrollTo({ top: document.getElementById('replyFormCard').offsetTop - 80, behavior: 'smooth' });
-                        });
-                    });
-                }
-            }
-
-            function createMessage(topicId, body, attachments, parentId = null) {
-                if (!isLoggedIn()) return null;
-                const userId = getCurrentUserId();
-                const messages = getData(KEYS.MESSAGES) || [];
-                const messageId = getNextId('messages');
-                const newMessage = {
-                    id: messageId,
-                    topicId: topicId,
-                    authorId: userId,
-                    body: body,
-                    attachments: attachments || [],
-                    parentId: parentId,
-                    createdAt: new Date().toISOString()
-                };
-                messages.push(newMessage);
-                setData(KEYS.MESSAGES, messages);
-                incrementUserMessageCount(userId);
-                return messageId;
-            }
-
-            function renderSearchView() {
-                const container = document.getElementById('viewContainer');
-                let html = `
-                    <h1 style="font-family:var(--font-heading);font-size:1.8rem;margin-bottom:16px;">🔍 Поиск по форуму</h1>
-                    <div class="search-bar">
-                        <input type="text" class="form-input" id="searchInput" placeholder="Введите запрос..." value="${escapeHTML(currentSearchQuery)}">
-                        <button class="btn btn-primary" id="btnSearch">Найти</button>
-                    </div>
-                    <div id="searchResults"></div>`;
-                container.innerHTML = html;
-
-                document.getElementById('btnSearch').addEventListener('click', performSearch);
-                document.getElementById('searchInput').addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') performSearch();
-                });
-
-                if (currentSearchQuery) {
-                    performSearch();
-                }
-            }
-
-            function performSearch() {
-                const query = document.getElementById('searchInput').value.trim().toLowerCase();
-                currentSearchQuery = query;
-                const resultsDiv = document.getElementById('searchResults');
-                if (!query) {
-                    resultsDiv.innerHTML = '<p class="text-muted">Введите поисковый запрос.</p>';
-                    return;
-                }
-                const topics = getData(KEYS.TOPICS) || [];
-                const messages = getData(KEYS.MESSAGES) || [];
-                const matchedTopics = [];
-
-                for (const topic of topics) {
-                    if (topic.title.toLowerCase().includes(query)) {
-                        matchedTopics.push({ ...topic, matchType: 'title' });
-                        continue;
-                    }
-                    const topicMessages = messages.filter(m => m.topicId === topic.id);
-                    if (topicMessages.some(m => m.body.toLowerCase().includes(query))) {
-                        matchedTopics.push({ ...topic, matchType: 'content' });
-                    }
-                }
-
-                if (matchedTopics.length === 0) {
-                    resultsDiv.innerHTML = '<div class="empty-state"><span class="icon">🔎</span><h3>Ничего не найдено</h3></div>';
-                    return;
-                }
-
-                let html = '';
-                for (const topic of matchedTopics) {
-                    const author = getUserById(topic.authorId);
-                    const authorName = author ? escapeHTML(author.username) : 'Неизвестный';
-                    html += `
-                        <div class="card topic-card" data-topic-id="${topic.id}" style="cursor:pointer;">
-                            <div class="card-header">
-                                <span class="card-title">${escapeHTML(topic.title)}</span>
-                                <span class="badge badge-magenta">${topic.matchType === 'title' ? 'Заголовок' : 'Содержимое'}</span>
-                            </div>
-                            <div class="card-meta">
-                                <span>👤 ${authorName}</span>
-                                <span>🕐 ${formatDate(topic.createdAt)}</span>
-                                <span>✉ ${topic.messageCount || 0}</span>
-                            </div>
-                        </div>`;
-                }
-                resultsDiv.innerHTML = html;
-                resultsDiv.querySelectorAll('.topic-card').forEach(card => {
-                    card.addEventListener('click', function() {
-                        navigateTo('topic', { topicId: parseInt(this.dataset.topicId) });
-                    });
-                });
-            }
-
-            function renderProfileView() {
-                const userId = currentProfileUserId || getCurrentUserId();
-                if (!userId) {
-                    navigateTo('topics');
-                    return;
-                }
-                const user = getUserById(userId);
-                if (!user) {
-                    document.getElementById('viewContainer').innerHTML = '<div class="empty-state"><h3>Пользователь не найден</h3></div>';
-                    return;
-                }
-                const isOwner = isLoggedIn() && getCurrentUserId() === userId;
-                const container = document.getElementById('viewContainer');
-
-                let html = `
-                    <div class="profile-header">
-                        ${user.avatar ? `<img src="${escapeHTML(user.avatar)}" class="profile-avatar" alt="Avatar">` : '<div class="profile-avatar-placeholder">👤</div>'}
-                        <div class="profile-info">
-                            <h2>${escapeHTML(user.username)}</h2>
-                            <div class="profile-stats">
-                                <span>📋 Тем: ${user.topicCount || 0}</span>
-                                <span>💬 Сообщений: ${user.messageCount || 0}</span>
-                            </div>
-                            ${user.bio ? `<p class="mt-8 text-muted">${escapeHTML(user.bio)}</p>` : ''}
-                        </div>
-                    </div>`;
-
-                if (isOwner) {
-                    html += `<button class="btn btn-outline" id="btnEditProfile">✏️ Редактировать профиль</button>`;
-                }
-
-                container.innerHTML = html;
-
-                if (isOwner) {
-                    document.getElementById('btnEditProfile').addEventListener('click', openEditProfileModal);
-                }
-            }
-
-            function openEditProfileModal() {
-                const user = getCurrentUser();
-                if (!user) return;
-                const modalId = 'editProfileModal';
-                const contentHTML = `
-                    <h2>✏️ Редактирование профиля</h2>
-                    <div class="form-group">
-                        <label>Никнейм</label>
-                        <input type="text" class="form-input" id="editUsername" value="${escapeHTML(user.username)}" maxlength="30">
-                    </div>
-                    <div class="form-group">
-                        <label>О себе</label>
-                        <textarea class="form-textarea" id="editBio" rows="3">${escapeHTML(user.bio || '')}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Аватар</label>
-                        <div class="flex-row gap-8">
-                            <button class="btn btn-outline btn-sm" id="btnChangeAvatar">📷 Загрузить аватар</button>
-                            ${user.avatar ? '<button class="btn btn-danger btn-sm" id="btnRemoveAvatar">Удалить</button>' : ''}
-                        </div>
-                        <div id="avatarPreview" class="mt-8">${user.avatar ? `<img src="${escapeHTML(user.avatar)}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">` : ''}</div>
-                        <input type="file" id="editAvatarInput" accept="image/*" class="hidden">
-                    </div>
-                    <div id="editProfileError" style="color:#ff6666!important;min-height:20px;" class="mt-8"></div>
-                    <button class="btn btn-primary mt-8" id="btnSaveProfile">Сохранить</button>
-                `;
-                openModal(modalId, contentHTML);
-
-                let tempAvatar = user.avatar;
-
-                document.getElementById('btnChangeAvatar').addEventListener('click', function() {
-                    document.getElementById('editAvatarInput').click();
-                });
-                document.getElementById('editAvatarInput').addEventListener('change', async function() {
-                    const file = this.files[0];
-                    if (!file) return;
-                    if (!isImageFile(file)) {
-                        document.getElementById('editProfileError').textContent = 'Можно загружать только изображения.';
-                        return;
-                    }
-                    const sizeCheck = validateFileSize(file, 2);
-                    if (!sizeCheck.valid) {
-                        document.getElementById('editProfileError').textContent = sizeCheck.error;
-                        return;
-                    }
-                    try {
-                        tempAvatar = await fileToBase64(file);
-                        document.getElementById('avatarPreview').innerHTML = `<img src="${tempAvatar}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">`;
-                        document.getElementById('editProfileError').textContent = '';
-                    } catch (e) {
-                        document.getElementById('editProfileError').textContent = 'Ошибка загрузки.';
-                    }
-                });
-
-                const btnRemove = document.getElementById('btnRemoveAvatar');
-                if (btnRemove) {
-                    btnRemove.addEventListener('click', function() {
-                        tempAvatar = null;
-                        document.getElementById('avatarPreview').innerHTML = '';
-                    });
-                }
-
-                document.getElementById('btnSaveProfile').addEventListener('click', async function() {
-                    const newUsername = document.getElementById('editUsername').value.trim();
-                    const newBio = document.getElementById('editBio').value.trim();
-                    const errorEl = document.getElementById('editProfileError');
-                    if (newUsername.length < 2) {
-                        errorEl.textContent = 'Ник должен содержать минимум 2 символа.';
-                        return;
-                    }
-                    const updates = { username: newUsername, bio: newBio, avatar: tempAvatar };
-                    const success = updateUserProfile(user.id, updates);
-                    if (success) {
-                        closeModal(modalId);
-                        renderHeader();
-                        navigateTo('profile', { userId: user.id });
-                    } else {
-                        errorEl.textContent = 'Ошибка при сохранении. Возможно, ник занят.';
-                    }
-                });
-            }
-
-            function initLogoHandlers() {
-                document.getElementById('btnUploadLogo').addEventListener('click', function() {
-                    document.getElementById('hiddenLogoInput').click();
-                });
-                document.getElementById('hiddenLogoInput').addEventListener('change', async function() {
-                    const file = this.files[0];
-                    if (!file) return;
-                    if (!isImageFile(file)) {
-                        alert('Пожалуйста, выберите изображение.');
-                        return;
-                    }
-                    const sizeCheck = validateFileSize(file, 2);
-                    if (!sizeCheck.valid) {
-                        alert(sizeCheck.error);
-                        return;
-                    }
-                    try {
-                        const base64 = await fileToBase64(file);
-                        setLogo(base64);
-                        renderHeader();
-                    } catch (e) {
-                        alert('Ошибка загрузки логотипа.');
-                    }
-                    this.value = '';
-                });
-                document.getElementById('btnDeleteLogo').addEventListener('click', function() {
-                    if (confirm('Удалить логотип и вернуть текстовое название?')) {
-                        removeLogo();
-                        renderHeader();
-                    }
-                });
-            }
-
-            function bindGlobalEvents() {
-                document.getElementById('btnShowAuth').addEventListener('click', () => openAuthModal('login'));
-                document.getElementById('btnLogout').addEventListener('click', () => {
-                    logoutUser();
-                    renderHeader();
-                    navigateTo('topics');
-                });
-                document.getElementById('userGreeting').addEventListener('click', () => {
-                    if (isLoggedIn()) navigateTo('profile', { userId: getCurrentUserId() });
-                });
-                document.getElementById('logoArea').addEventListener('click', () => navigateTo('topics'));
-                document.querySelectorAll('#nav-links a[data-view]').forEach(link => {
-                    link.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        navigateTo(this.dataset.view);
-                    });
-                });
-                document.getElementById('btnNewTopic').addEventListener('click', openCreateTopicModal);
-                initLogoHandlers();
-            }
-
-            function initApp() {
-                renderHeader();
-                bindGlobalEvents();
-                navigateTo('topics');
-            }
-
-            initApp();
-        })();
-    </script>
+  <h1>☠️ FusionGate ☠️</h1>
+
+  <div class="auth">
+    <span id="user-info"></span>
+    <button id="login-btn" class="hidden">🔑 Login / Register</button>
+    <button id="logout-btn" class="hidden">🚪 Logout</button>
+  </div>
+
+  <!-- Форма входа/регистрации -->
+  <div id="auth-modal" class="login-form">
+    <div id="auth-tabs">
+      <button id="show-login" style="border-bottom: 2px solid #00ff66;">Login</button>
+      <button id="show-register">Register</button>
+    </div>
+    <div id="login-form-fields">
+      <input type="email" id="login-email" placeholder="Email" />
+      <input type="password" id="login-password" placeholder="Password" />
+      <button id="email-login-btn">Login with Email</button>
+      <div class="login-buttons">
+        <button id="google-login-btn">Google</button>
+        <button id="github-login-btn">GitHub</button>
+      </div>
+    </div>
+    <div id="register-form-fields" class="hidden">
+      <input type="email" id="reg-email" placeholder="Email" />
+      <input type="password" id="reg-password" placeholder="Password (min 6 chars)" />
+      <button id="email-register-btn">Register</button>
+      <div class="login-buttons">
+        <button id="google-register-btn">Google</button>
+        <button id="github-register-btn">GitHub</button>
+      </div>
+      <div class="signup-link" id="back-to-login">Already have an account? Login</div>
+    </div>
+  </div>
+
+  <div id="topics-view">
+    <div id="new-topic-form" class="new-topic hidden">
+      <input type="text" id="topic-title-input" placeholder="Cheat name / request title..." />
+      <textarea id="topic-body-input" placeholder="First message (details, download, etc.)..."></textarea>
+      <button id="create-topic-btn">Post new topic</button>
+    </div>
+    <h2>📁 Topics</h2>
+    <ul id="topic-list" class="topic-list"></ul>
+    <div id="no-topics" class="hidden">No topics yet. Share your cheat or ask a question!</div>
+  </div>
+
+  <div id="topic-detail" class="hidden">
+    <button class="back-btn">⬅ Back to topics</button>
+    <h2 id="detail-title"></h2>
+    <div id="detail-body" style="white-space: pre-wrap; margin: 15px 0;"></div>
+    <hr>
+    <h3>💬 Replies</h3>
+    <ul id="comment-list" class="comments"></ul>
+    <div id="reply-form" class="new-topic hidden">
+      <textarea id="reply-input" placeholder="Write a reply..."></textarea>
+      <button id="post-reply-btn">Send reply</button>
+    </div>
+  </div>
+
+  <script>
+    // ================= ВАЖНО: ЗАМЕНИ ЭТИ ДАННЫЕ =================
+    const firebaseConfig = {
+      apiKey: "AIzaSyCXBqGfPPCtUL_dendridmJm_mKzgn4MQk",
+      authDomain: "fusiongate-372ba.firebaseapp.com",
+      projectId: "fusiongate-372ba",
+      storageBucket: "fusiongate-372ba.firebasestorage.app",
+    messagingSenderId: "150689717529",
+     appId: "1:150689717529:web:6cc6a86df30c3d9e653988",
+    measurementId: "G-NTJTK1SQX7"
+    };
+    const GITHUB_PAGES_URL = "https://yourusername.github.io/your-repo"; // без слеша в конце
+    // ===============================================================
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    const githubProvider = new firebase.auth.GithubAuthProvider();
+
+    // UI элементы
+    const authModal = document.getElementById('auth-modal');
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userInfo = document.getElementById('user-info');
+    const topicsView = document.getElementById('topics-view');
+    const topicDetail = document.getElementById('topic-detail');
+    const newTopicForm = document.getElementById('new-topic-form');
+    const topicListEl = document.getElementById('topic-list');
+    const noTopics = document.getElementById('no-topics');
+    const createTopicBtn = document.getElementById('create-topic-btn');
+    const topicTitleInput = document.getElementById('topic-title-input');
+    const topicBodyInput = document.getElementById('topic-body-input');
+    const backBtn = document.querySelector('.back-btn');
+    const replyForm = document.getElementById('reply-form');
+    const replyInput = document.getElementById('reply-input');
+    const postReplyBtn = document.getElementById('post-reply-btn');
+
+    // Auth UI
+    const showLoginBtn = document.getElementById('show-login');
+    const showRegisterBtn = document.getElementById('show-register');
+    const loginFields = document.getElementById('login-form-fields');
+    const registerFields = document.getElementById('register-form-fields');
+    const loginEmail = document.getElementById('login-email');
+    const loginPassword = document.getElementById('login-password');
+    const regEmail = document.getElementById('reg-email');
+    const regPassword = document.getElementById('reg-password');
+
+    let currentUser = null;
+
+    // Переключение табов логин/регистрация
+    showLoginBtn.addEventListener('click', () => {
+      showLoginBtn.style.borderBottom = '2px solid #00ff66';
+      showRegisterBtn.style.borderBottom = 'none';
+      loginFields.classList.remove('hidden');
+      registerFields.classList.add('hidden');
+    });
+    showRegisterBtn.addEventListener('click', () => {
+      showRegisterBtn.style.borderBottom = '2px solid #00ff66';
+      showLoginBtn.style.borderBottom = 'none';
+      registerFields.classList.remove('hidden');
+      loginFields.classList.add('hidden');
+    });
+    document.getElementById('back-to-login').addEventListener('click', () => {
+      showLoginBtn.click();
+    });
+
+    // Отслеживание состояния аутентификации
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      updateUI(user);
+      if (user) {
+        loadTopics();
+        const params = new URLSearchParams(window.location.search);
+        const topicId = params.get('topic');
+        if (topicId) loadTopic(topicId);
+      } else {
+        loadTopics();
+      }
+    });
+
+    // Результат редиректа (Google, GitHub)
+    auth.getRedirectResult().then(result => {
+      if (result.user) console.log('Logged in as', result.user);
+    }).catch(error => {
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        alert('An account already exists with this email. Please sign in using that method.');
+      } else if (error.code !== 'auth/cancelled-popup-request') {
+        console.error('Login error:', error.message);
+      }
+    });
+
+    function updateUI(user) {
+      if (user) {
+        authModal.classList.add('hidden');
+        logoutBtn.classList.remove('hidden');
+        loginBtn.classList.add('hidden');
+        userInfo.textContent = `@${user.displayName || user.email || user.uid}`;
+        newTopicForm.classList.remove('hidden');
+        replyForm.classList.remove('hidden');
+      } else {
+        authModal.classList.remove('hidden');
+        logoutBtn.classList.add('hidden');
+        loginBtn.classList.add('hidden');
+        userInfo.textContent = '';
+        newTopicForm.classList.add('hidden');
+        replyForm.classList.add('hidden');
+        loginEmail.value = '';
+        loginPassword.value = '';
+        regEmail.value = '';
+        regPassword.value = '';
+      }
+    }
+
+    // Email/Password вход
+    document.getElementById('email-login-btn').addEventListener('click', async () => {
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value.trim();
+      if (!email || !password) return alert('Email and password required.');
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+      } catch (error) {
+        alert('Login error: ' + error.message);
+      }
+    });
+
+    // Email/Password регистрация
+    document.getElementById('email-register-btn').addEventListener('click', async () => {
+      const email = regEmail.value.trim();
+      const password = regPassword.value.trim();
+      if (!email || !password) return alert('Email and password required.');
+      if (password.length < 6) return alert('Password must be at least 6 characters.');
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+      } catch (error) {
+        alert('Registration error: ' + error.message);
+      }
+    });
+
+    // Google вход (одинаково для логина и регистрации)
+    document.getElementById('google-login-btn').addEventListener('click', () => {
+      auth.signInWithRedirect(googleProvider);
+    });
+    document.getElementById('google-register-btn').addEventListener('click', () => {
+      auth.signInWithRedirect(googleProvider);
+    });
+
+    // GitHub вход
+    document.getElementById('github-login-btn').addEventListener('click', () => {
+      auth.signInWithRedirect(githubProvider);
+    });
+    document.getElementById('github-register-btn').addEventListener('click', () => {
+      auth.signInWithRedirect(githubProvider);
+    });
+
+    // Выход
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut();
+    });
+
+    // ========== Работа с темами ==========
+    async function loadTopics() {
+      const snapshot = await db.collection('topics').orderBy('createdAt', 'desc').get();
+      topicListEl.innerHTML = '';
+      if (snapshot.empty) {
+        noTopics.classList.remove('hidden');
+        return;
+      }
+      noTopics.classList.add('hidden');
+      snapshot.forEach(doc => {
+        const topic = doc.data();
+        const li = document.createElement('li');
+        li.className = 'topic-item';
+        li.innerHTML = `
+          <div class="topic-title">${escapeHtml(topic.title)}</div>
+          <div class="meta">by ${topic.authorName} • ${new Date(topic.createdAt?.toDate ? topic.createdAt.toDate() : topic.createdAt).toLocaleString()}</div>
+        `;
+        li.addEventListener('click', () => {
+          history.pushState({}, '', `${window.location.pathname}?topic=${doc.id}`);
+          loadTopic(doc.id);
+        });
+        topicListEl.appendChild(li);
+      });
+    }
+
+    async function loadTopic(topicId) {
+      if (!topicId) return;
+      topicsView.classList.add('hidden');
+      topicDetail.classList.remove('hidden');
+
+      const docRef = db.collection('topics').doc(topicId);
+      const doc = await docRef.get();
+      if (!doc.exists) {
+        alert('Topic not found');
+        backToList();
+        return;
+      }
+      const topic = doc.data();
+      document.getElementById('detail-title').textContent = topic.title;
+      document.getElementById('detail-body').textContent = topic.body;
+
+      const commentsSnap = await docRef.collection('comments').orderBy('createdAt', 'asc').get();
+      const commentList = document.getElementById('comment-list');
+      commentList.innerHTML = '';
+      commentsSnap.forEach(commDoc => {
+        const comm = commDoc.data();
+        const li = document.createElement('li');
+        li.className = 'comment-item';
+        li.innerHTML = `
+          <div class="comment-author">
+            <span>${escapeHtml(comm.authorName)}</span>
+            <span class="meta">${new Date(comm.createdAt?.toDate ? comm.createdAt.toDate() : comm.createdAt).toLocaleString()}</span>
+          </div>
+          <div>${escapeHtml(comm.body)}</div>
+        `;
+        commentList.appendChild(li);
+      });
+
+      topicDetail.dataset.topicId = topicId;
+    }
+
+    // Создание темы
+    createTopicBtn.addEventListener('click', async () => {
+      const title = topicTitleInput.value.trim();
+      const body = topicBodyInput.value.trim();
+      if (!title || !body) return alert('Both title and body are required.');
+      if (!currentUser) return alert('Login first.');
+
+      try {
+        await db.collection('topics').add({
+          title,
+          body,
+          authorUid: currentUser.uid,
+          authorName: currentUser.displayName || currentUser.email || currentUser.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        topicTitleInput.value = '';
+        topicBodyInput.value = '';
+        loadTopics();
+      } catch (err) {
+        console.error('Error creating topic:', err);
+        alert('Failed to create topic.');
+      }
+    });
+
+    // Ответ на тему
+    postReplyBtn.addEventListener('click', async () => {
+      const body = replyInput.value.trim();
+      if (!body) return alert('Reply cannot be empty.');
+      if (!currentUser) return alert('Login first.');
+      const topicId = topicDetail.dataset.topicId;
+      if (!topicId) return;
+
+      try {
+        await db.collection('topics').doc(topicId).collection('comments').add({
+          body,
+          authorUid: currentUser.uid,
+          authorName: currentUser.displayName || currentUser.email || currentUser.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        replyInput.value = '';
+        loadTopic(topicId);
+      } catch (err) {
+        console.error('Error posting reply:', err);
+        alert('Failed to post reply.');
+      }
+    });
+
+    // Навигация
+    backBtn.addEventListener('click', backToList);
+    function backToList() {
+      history.pushState({}, '', window.location.pathname);
+      topicsView.classList.remove('hidden');
+      topicDetail.classList.add('hidden');
+      loadTopics();
+    }
+    window.addEventListener('popstate', () => {
+      const params = new URLSearchParams(window.location.search);
+      const topicId = params.get('topic');
+      if (topicId) loadTopic(topicId);
+      else backToList();
+    });
+
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, function(m) {
+        return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m];
+      });
+    }
+
+    // Первая загрузка
+    loadTopics();
+    const params = new URLSearchParams(window.location.search);
+    const topicId = params.get('topic');
+    if (topicId && auth.currentUser) {
+      loadTopic(topicId);
+    }
+  </script>
 </body>
 </html>
