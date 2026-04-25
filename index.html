@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FusionGate — Форум</title>
-    <!-- Google Fonts: Rajdhani для заголовков, JetBrains Mono для кода, Inter для тела -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -58,7 +57,6 @@
             color: var(--text-primary);
             min-height: 100vh;
             line-height: 1.6;
-            /* Сетка на фоне в стиле киберпанк */
             background-image:
                 linear-gradient(rgba(0, 255, 204, 0.025) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 255, 204, 0.025) 1px, transparent 1px);
@@ -67,7 +65,6 @@
             background-attachment: fixed;
         }
 
-        /* Скроллбар в стиле киберпанк */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -83,7 +80,6 @@
             background: rgba(0, 255, 204, 0.55);
         }
 
-        /* ========== HEADER ========== */
         #header {
             position: sticky;
             top: 0;
@@ -164,7 +160,6 @@
             box-shadow: 0 0 10px rgba(255, 80, 80, 0.35);
         }
 
-        /* Навигация */
         #nav-links {
             display: flex;
             align-items: center;
@@ -205,7 +200,6 @@
             box-shadow: 0 0 18px rgba(0, 255, 204, 0.3);
         }
 
-        /* Блок пользователя */
         .user-area {
             display: flex;
             align-items: center;
@@ -287,7 +281,6 @@
             flex-shrink: 0;
         }
 
-        /* ========== MAIN CONTENT ========== */
         #main-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -296,47 +289,22 @@
             animation: fadeInUp 0.35s ease;
         }
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         @keyframes pulseGlow {
-            0%,
-            100% {
-                box-shadow: 0 0 8px rgba(0, 255, 204, 0.2);
-            }
-            50% {
-                box-shadow: 0 0 22px rgba(0, 255, 204, 0.5);
-            }
+            0%, 100% { box-shadow: 0 0 8px rgba(0, 255, 204, 0.2); }
+            50% { box-shadow: 0 0 22px rgba(0, 255, 204, 0.5); }
         }
         @keyframes neonFlicker {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            92% {
-                opacity: 1;
-            }
-            93% {
-                opacity: 0.6;
-            }
-            94% {
-                opacity: 1;
-            }
-            96% {
-                opacity: 0.75;
-            }
-            97% {
-                opacity: 1;
-            }
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.6; }
+            94% { opacity: 1; }
+            96% { opacity: 0.75; }
+            97% { opacity: 1; }
         }
 
-        /* Карточки */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
@@ -419,7 +387,6 @@
             border: 1px solid rgba(255, 0, 255, 0.3);
         }
 
-        /* Кнопки */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -469,7 +436,6 @@
             box-shadow: 0 0 14px rgba(255, 85, 85, 0.3);
         }
 
-        /* Формы */
         .form-group {
             margin-bottom: 16px;
         }
@@ -511,7 +477,6 @@
             margin-top: 4px;
         }
 
-        /* Модальные окна */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -527,12 +492,8 @@
             animation: fadeIn 0.2s ease;
         }
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         .modal-dialog {
             background: var(--bg-card);
@@ -604,7 +565,6 @@
             color: #fff;
         }
 
-        /* Сообщения */
         .message-thread {
             margin-left: 0;
             border-left: 2px solid var(--border-subtle);
@@ -701,7 +661,6 @@
             color: var(--text-secondary);
         }
 
-        /* Пагинация */
         .pagination {
             display: flex;
             align-items: center;
@@ -738,7 +697,6 @@
             pointer-events: none;
         }
 
-        /* Поиск */
         .search-bar {
             display: flex;
             gap: 8px;
@@ -750,7 +708,6 @@
             min-width: 200px;
         }
 
-        /* Профиль */
         .profile-header {
             display: flex;
             align-items: center;
@@ -795,7 +752,6 @@
             color: var(--text-secondary);
         }
 
-        /* Пустое состояние */
         .empty-state {
             text-align: center;
             padding: 50px 20px;
@@ -813,7 +769,6 @@
             margin-bottom: 8px;
         }
 
-        /* ========== АДАПТИВ ========== */
         @media (max-width: 768px) {
             .header-inner {
                 flex-wrap: wrap;
@@ -836,23 +791,11 @@
                 padding: 6px 10px;
                 font-size: 0.76rem;
             }
-            .logo-area {
-                order: 1;
-            }
-            .user-area {
-                order: 2;
-                margin-left: auto;
-            }
-            .card {
-                padding: 14px 16px;
-            }
-            .card-title {
-                font-size: 1.05rem;
-            }
-            .modal-dialog {
-                width: 96%;
-                padding: 20px 16px;
-            }
+            .logo-area { order: 1; }
+            .user-area { order: 2; margin-left: auto; }
+            .card { padding: 14px 16px; }
+            .card-title { font-size: 1.05rem; }
+            .modal-dialog { width: 96%; padding: 20px 16px; }
         }
         @media (max-width: 480px) {
             #nav-links li a,
@@ -861,61 +804,29 @@
                 font-size: 0.7rem;
                 gap: 2px;
             }
-            .logo-text {
-                font-size: 1.2rem;
-            }
-            .logo-img {
-                height: 28px;
-                max-width: 100px;
-            }
-            .btn {
-                padding: 7px 12px;
-                font-size: 0.78rem;
-            }
+            .logo-text { font-size: 1.2rem; }
+            .logo-img { height: 28px; max-width: 100px; }
+            .btn { padding: 7px 12px; font-size: 0.78rem; }
             .profile-avatar,
-            .profile-avatar-placeholder {
-                width: 60px;
-                height: 60px;
-                font-size: 1.4rem;
-            }
+            .profile-avatar-placeholder { width: 60px; height: 60px; font-size: 1.4rem; }
         }
 
-        /* Утилиты */
-        .hidden {
-            display: none !important;
-        }
-        .text-cyan {
-            color: var(--neon-cyan);
-        }
-        .text-magenta {
-            color: var(--neon-magenta);
-        }
-        .text-muted {
-            color: var(--text-muted);
-        }
-        .mt-8 {
-            margin-top: 8px;
-        }
-        .mt-16 {
-            margin-top: 16px;
-        }
-        .gap-8 {
-            gap: 8px;
-        }
-        .flex-row {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .hidden { display: none !important; }
+        .text-cyan { color: var(--neon-cyan); }
+        .text-magenta { color: var(--neon-magenta); }
+        .text-muted { color: var(--text-muted); }
+        .mt-8 { margin-top: 8px; }
+        .mt-16 { margin-top: 16px; }
+        .mb-16 { margin-bottom: 16px; }
+        .gap-8 { gap: 8px; }
+        .flex-row { display: flex; align-items: center; flex-wrap: wrap; }
     </style>
 </head>
 <body>
 
-    <!-- ==================== HEADER ==================== -->
     <header id="header">
         <div class="header-inner">
             <div class="logo-area" id="logoArea" title="FusionGate — на главную">
-                <!-- Логотип (изображение или текст) рендерится через JS -->
                 <span class="logo-text" id="logoText">FusionGate</span>
                 <img class="logo-img hidden" id="logoImg" src="" alt="FusionGate Logo">
             </div>
@@ -929,11 +840,9 @@
             </ul>
 
             <div class="user-area" id="userArea">
-                <!-- Гостевой режим -->
                 <span id="guestButtons">
                     <button class="btn btn-login" id="btnShowAuth">🔐 Войти</button>
                 </span>
-                <!-- Режим пользователя -->
                 <span id="userInfo" class="hidden">
                     <span class="user-greeting" id="userGreeting" title="Профиль">
                         <span id="userAvatarMini"></span>
@@ -945,25 +854,16 @@
         </div>
     </header>
 
-    <!-- ==================== MAIN CONTENT ==================== -->
     <main id="main-content">
-        <!-- Динамический контент рендерится через JS -->
         <div id="viewContainer"></div>
     </main>
 
-    <!-- ==================== МОДАЛЬНЫЕ ОКНА ==================== -->
     <div id="modalsContainer"></div>
 
-    <!-- Скрытый инпут для загрузки логотипа -->
     <input type="file" id="hiddenLogoInput" accept="image/*" class="hidden">
-
-    <!-- Скрытый инпут для загрузки аватара -->
     <input type="file" id="hiddenAvatarInput" accept="image/*" class="hidden">
-
-    <!-- Скрытый инпут для загрузки вложений в сообщения -->
     <input type="file" id="hiddenAttachmentInput" accept="image/*,video/mp4,video/webm" class="hidden" multiple>
 
-    <!-- ==================== ФУТЕР ==================== -->
     <footer style="text-align:center;padding:16px;font-size:0.7rem;color:var(--text-muted);border-top:1px solid var(--border-subtle);">
         <span>FusionGate © 2026</span>
         <span style="margin:0 8px;">|</span>
@@ -986,9 +886,6 @@
             };
             const TOPICS_PER_PAGE = 15;
 
-            // ============================================================
-            //  РАБОТА С ДАННЫМИ В localStorage
-            // ============================================================
             function getData(key) {
                 try {
                     const raw = localStorage.getItem(key);
@@ -1016,7 +913,6 @@
                 return id;
             }
 
-            // Инициализация хранилища, если пусто
             function initStorage() {
                 if (!getData(KEYS.USERS)) setData(KEYS.USERS, []);
                 if (!getData(KEYS.TOPICS)) setData(KEYS.TOPICS, []);
@@ -1027,9 +923,6 @@
                 }
             }
 
-            // ============================================================
-            //  ХЕШИРОВАНИЕ ПАРОЛЕЙ (SHA-256 через SubtleCrypto)
-            // ============================================================
             async function hashPassword(password) {
                 const encoder = new TextEncoder();
                 const data = encoder.encode(password);
@@ -1038,9 +931,6 @@
                 return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
             }
 
-            // ============================================================
-            //  СЕССИЯ ПОЛЬЗОВАТЕЛЯ
-            // ============================================================
             function getSession() {
                 return getData(KEYS.SESSION);
             }
@@ -1070,12 +960,8 @@
                 return users.find(u => u.id === session.userId) || null;
             }
 
-            // ============================================================
-            //  АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ
-            // ============================================================
             async function registerUser(username, password) {
                 const users = getData(KEYS.USERS) || [];
-                // Проверка уникальности ника
                 if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
                     return { success: false, error: 'Пользователь с таким ником уже существует.' };
                 }
@@ -1090,7 +976,7 @@
                     id: getNextId('users'),
                     username: username.trim(),
                     passwordHash: passwordHash,
-                    avatar: null, // base64 строка или null
+                    avatar: null,
                     bio: '',
                     createdAt: new Date().toISOString(),
                     topicCount: 0,
@@ -1098,7 +984,6 @@
                 };
                 users.push(newUser);
                 setData(KEYS.USERS, users);
-                // Автоматический вход после регистрации
                 setSession({ userId: newUser.id, username: newUser.username });
                 return { success: true, user: newUser };
             }
@@ -1121,26 +1006,20 @@
                 clearSession();
             }
 
-            // ============================================================
-            //  ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
-            // ============================================================
             function updateUserProfile(userId, updates) {
                 const users = getData(KEYS.USERS) || [];
                 const index = users.findIndex(u => u.id === userId);
                 if (index === -1) return false;
-                // Нельзя менять id, passwordHash, createdAt, topicCount, messageCount через профиль
                 const allowedKeys = ['avatar', 'bio'];
                 for (const key of allowedKeys) {
                     if (updates[key] !== undefined) {
                         users[index][key] = updates[key];
                     }
                 }
-                // Если меняется username — нужна доп. проверка
                 if (updates.username && updates.username.trim().length >= 2) {
                     const trimmed = updates.username.trim();
                     if (!users.some(u => u.username.toLowerCase() === trimmed.toLowerCase() && u.id !== userId)) {
                         users[index].username = trimmed;
-                        // Обновить сессию
                         const session = getSession();
                         if (session && session.userId === userId) {
                             session.username = trimmed;
@@ -1175,9 +1054,6 @@
                 return users.find(u => u.id === userId) || null;
             }
 
-            // ============================================================
-            //  ЛОГОТИП ФОРУМА
-            // ============================================================
             function getLogo() {
                 return localStorage.getItem(KEYS.LOGO) || null;
             }
@@ -1190,9 +1066,6 @@
                 localStorage.removeItem(KEYS.LOGO);
             }
 
-            // ============================================================
-            //  КОНВЕРТАЦИЯ ФАЙЛА В BASE64
-            // ============================================================
             function fileToBase64(file) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -1210,25 +1083,11 @@
                 return { valid: true };
             }
 
-            function isImageFile(file) {
-                return file.type.startsWith('image/');
-            }
+            function isImageFile(file) { return file.type.startsWith('image/'); }
+            function isVideoFile(file) { return file.type.startsWith('video/'); }
+            function isImageURL(url) { return /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url) || url.startsWith('data:image/'); }
+            function isVideoURL(url) { return /\.(mp4|webm)(\?.*)?$/i.test(url) || url.startsWith('data:video/'); }
 
-            function isVideoFile(file) {
-                return file.type.startsWith('video/');
-            }
-
-            function isImageURL(url) {
-                return /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url) || url.startsWith('data:image/');
-            }
-
-            function isVideoURL(url) {
-                return /\.(mp4|webm)(\?.*)?$/i.test(url) || url.startsWith('data:video/');
-            }
-
-            // ============================================================
-            //  ЭКРАНИРОВАНИЕ HTML (защита от XSS)
-            // ============================================================
             function escapeHTML(str) {
                 const div = document.createElement('div');
                 div.textContent = str;
@@ -1236,13 +1095,9 @@
             }
 
             function sanitizeText(str) {
-                // Экранируем HTML, но разрешаем переносы строк
                 return escapeHTML(str).replace(/\n/g, '<br>');
             }
 
-            // ============================================================
-            //  ФОРМАТИРОВАНИЕ ДАТЫ
-            // ============================================================
             function formatDate(isoString) {
                 const d = new Date(isoString);
                 const now = new Date();
@@ -1254,9 +1109,7 @@
                 return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) +
                     ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             }
-            // ============================================================
-            //  HTML-КОМПОНЕНТЫ (генерация DOM-элементов)
-            // ============================================================
+
             function createModal(modalId, contentHTML) {
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
@@ -1284,9 +1137,7 @@
 
             function closeModal(modalId) {
                 const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.remove();
-                }
+                if (modal) modal.remove();
                 if (document.getElementById('modalsContainer').children.length === 0) {
                     document.body.style.overflow = '';
                 }
@@ -1297,18 +1148,13 @@
                 document.body.style.overflow = '';
             }
 
-            // ============================================================
-            //  ПОЛНОЭКРАННЫЙ ПРОСМОТР ВЛОЖЕНИЯ
-            // ============================================================
             function openFullscreenView(src, type) {
                 const modalId = 'fullscreenView';
                 let mediaHTML;
                 if (type === 'video') {
-                    mediaHTML =
-                        `<video src="${src}" controls autoplay style="max-width:90vw;max-height:85vh;border-radius:8px;"></video>`;
+                    mediaHTML = `<video src="${src}" controls autoplay style="max-width:90vw;max-height:85vh;border-radius:8px;"></video>`;
                 } else {
-                    mediaHTML =
-                        `<img src="${src}" style="max-width:90vw;max-height:85vh;border-radius:8px;object-fit:contain;" alt="Полноэкранный просмотр">`;
+                    mediaHTML = `<img src="${src}" style="max-width:90vw;max-height:85vh;border-radius:8px;object-fit:contain;" alt="Полноэкранный просмотр">`;
                 }
                 openModal(modalId, `
                     <div style="text-align:center;">
@@ -1320,9 +1166,6 @@
                 `);
             }
 
-            // ============================================================
-            //  РЕНДЕРИНГ ВЛОЖЕНИЙ В СООБЩЕНИИ
-            // ============================================================
             function renderAttachments(attachments) {
                 if (!attachments || attachments.length === 0) return '';
                 let html = '<div class="flex-row gap-8" style="margin-top:8px;">';
@@ -1330,36 +1173,24 @@
                     const src = escapeHTML(att.url);
                     const name = escapeHTML(att.name || 'вложение');
                     if (att.type === 'image') {
-                        html +=
-                            `<img src="${src}" alt="${name}" class="attachment-preview" onclick="event.stopPropagation();window._fg_openFullscreen('${src.replace(/'/g, "\\'")}', 'image')" loading="lazy" title="${name}">`;
+                        html += `<img src="${src}" alt="${name}" class="attachment-preview" onclick="event.stopPropagation();window._fg_openFullscreen('${src.replace(/'/g, "\\'")}', 'image')" loading="lazy" title="${name}">`;
                     } else if (att.type === 'video') {
-                        html +=
-                            `<video src="${src}" class="attachment-preview" muted preload="metadata" onclick="event.stopPropagation();window._fg_openFullscreen('${src.replace(/'/g, "\\'")}', 'video')" title="${name}"></video>`;
+                        html += `<video src="${src}" class="attachment-preview" muted preload="metadata" onclick="event.stopPropagation();window._fg_openFullscreen('${src.replace(/'/g, "\\'")}', 'video')" title="${name}"></video>`;
                     }
                 }
                 html += '</div>';
                 return html;
             }
-            // Экспорт глобальной функции для onclick
             window._fg_openFullscreen = openFullscreenView;
 
-            // ============================================================
-            //  ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
-            // ============================================================
             initStorage();
 
-            // ============================================================
-            //  ТЕКУЩЕЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ
-            // ============================================================
             let currentView = 'topics';
             let currentTopicPage = 1;
             let currentSearchQuery = '';
             let currentProfileUserId = null;
             let currentTopicId = null;
 
-            // ============================================================
-            //  ОТОБРАЖЕНИЕ ШАПКИ (логотип + пользователь)
-            // ============================================================
             function renderHeader() {
                 const logo = getLogo();
                 const logoImg = document.getElementById('logoImg');
@@ -1380,10 +1211,8 @@
                     btnUploadLogo.textContent = '🖼 Лого';
                 }
 
-                // Пользовательская часть
                 const guestButtons = document.getElementById('guestButtons');
                 const userInfo = document.getElementById('userInfo');
-                const userGreeting = document.getElementById('userGreeting');
                 const userNameDisplay = document.getElementById('userNameDisplay');
                 const userAvatarMini = document.getElementById('userAvatarMini');
                 const btnNewTopic = document.getElementById('btnNewTopic');
@@ -1394,11 +1223,9 @@
                     userInfo.classList.remove('hidden');
                     userNameDisplay.textContent = user ? user.username : '';
                     if (user && user.avatar) {
-                        userAvatarMini.innerHTML =
-                            `<img src="${escapeHTML(user.avatar)}" class="user-avatar-mini" alt="Avatar">`;
+                        userAvatarMini.innerHTML = `<img src="${escapeHTML(user.avatar)}" class="user-avatar-mini" alt="Avatar">`;
                     } else {
-                        userAvatarMini.innerHTML =
-                            '<span class="user-avatar-placeholder">👤</span>';
+                        userAvatarMini.innerHTML = '<span class="user-avatar-placeholder">👤</span>';
                     }
                     btnNewTopic.classList.remove('hidden');
                 } else {
@@ -1407,17 +1234,13 @@
                     btnNewTopic.classList.add('hidden');
                 }
             }
-            // ============================================================
-            //  НАВИГАЦИЯ ПО ВЬЮХАМ
-            // ============================================================
+
             function navigateTo(view, data = null) {
                 currentView = view;
-                // Обновляем активный пункт меню
                 document.querySelectorAll('#nav-links a').forEach(a => a.classList.remove('active'));
                 const activeLink = document.querySelector(`#nav-links a[data-view="${view}"]`);
                 if (activeLink) activeLink.classList.add('active');
 
-                const container = document.getElementById('viewContainer');
                 switch (view) {
                     case 'topics':
                         currentTopicPage = data && data.page ? data.page : 1;
@@ -1438,19 +1261,13 @@
                     default:
                         renderTopicsList();
                 }
-                // Скролл вверх при смене вьюхи
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                // Перерендер шапки (могла измениться сессия)
                 renderHeader();
             }
 
-            // ============================================================
-            //  РЕНДЕРИНГ СПИСКА ТЕМ
-            // ============================================================
             function renderTopicsList() {
                 const container = document.getElementById('viewContainer');
                 const topics = getData(KEYS.TOPICS) || [];
-                // Сортировка: новые сверху
                 const sortedTopics = [...topics].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 const totalPages = Math.max(1, Math.ceil(sortedTopics.length / TOPICS_PER_PAGE));
                 if (currentTopicPage > totalPages) currentTopicPage = totalPages;
@@ -1460,17 +1277,11 @@
                 let html = '<h1 style="font-family:var(--font-heading);font-size:1.8rem;margin-bottom:16px;letter-spacing:0.04em;">📋 Темы форума</h1>';
 
                 if (isLoggedIn()) {
-                    html +=
-                        `<button class="btn btn-primary mb-16" id="btnCreateTopicTop" style="margin-bottom:16px;">＋ Создать новую тему</button>`;
+                    html += `<button class="btn btn-primary mb-16" id="btnCreateTopicTop" style="margin-bottom:16px;">＋ Создать новую тему</button>`;
                 }
 
                 if (pageTopics.length === 0) {
-                    html += `
-                        <div class="empty-state">
-                            <span class="icon">💬</span>
-                            <h3>Тем пока нет</h3>
-                            <p>Будьте первым, кто создаст тему на форуме!</p>
-                        </div>`;
+                    html += `<div class="empty-state"><span class="icon">💬</span><h3>Тем пока нет</h3><p>Будьте первым, кто создаст тему на форуме!</p></div>`;
                 } else {
                     for (const topic of pageTopics) {
                         const author = getUserById(topic.authorId);
@@ -1490,30 +1301,23 @@
                     }
                 }
 
-                // Пагинация
                 if (totalPages > 1) {
                     html += '<div class="pagination">';
-                    html +=
-                        `<button ${currentTopicPage === 1 ? 'disabled' : ''} data-page="${currentTopicPage - 1}">◀ Назад</button>`;
+                    html += `<button ${currentTopicPage === 1 ? 'disabled' : ''} data-page="${currentTopicPage - 1}">◀ Назад</button>`;
                     for (let p = 1; p <= totalPages; p++) {
-                        html +=
-                            `<button class="${p === currentTopicPage ? 'active-page' : ''}" data-page="${p}">${p}</button>`;
+                        html += `<button class="${p === currentTopicPage ? 'active-page' : ''}" data-page="${p}">${p}</button>`;
                     }
-                    html +=
-                        `<button ${currentTopicPage === totalPages ? 'disabled' : ''} data-page="${currentTopicPage + 1}">Вперёд ▶</button>`;
+                    html += `<button ${currentTopicPage === totalPages ? 'disabled' : ''} data-page="${currentTopicPage + 1}">Вперёд ▶</button>`;
                     html += '</div>';
                 }
 
                 container.innerHTML = html;
 
-                // Обработчики кликов по карточкам тем
                 container.querySelectorAll('.topic-card').forEach(card => {
                     card.addEventListener('click', function() {
-                        const topicId = parseInt(this.dataset.topicId);
-                        navigateTo('topic', { topicId });
+                        navigateTo('topic', { topicId: parseInt(this.dataset.topicId) });
                     });
                 });
-                // Обработчики пагинации
                 container.querySelectorAll('.pagination button[data-page]').forEach(btn => {
                     btn.addEventListener('click', function() {
                         currentTopicPage = parseInt(this.dataset.page);
@@ -1521,15 +1325,10 @@
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     });
                 });
-                // Кнопка создания темы
                 const btnCreate = container.querySelector('#btnCreateTopicTop');
-                if (btnCreate) {
-                    btnCreate.addEventListener('click', openCreateTopicModal);
-                }
+                if (btnCreate) btnCreate.addEventListener('click', openCreateTopicModal);
             }
-            // ============================================================
-            //  МОДАЛЬНОЕ ОКНО: АВТОРИЗАЦИЯ / РЕГИСТРАЦИЯ
-            // ============================================================
+
             function openAuthModal(tab = 'login') {
                 const modalId = 'authModal';
                 const contentHTML = `
@@ -1544,13 +1343,11 @@
                 openModal(modalId, contentHTML);
                 renderAuthForm(tab);
 
-                // Обработчики табов
                 const modalEl = document.getElementById(modalId);
                 modalEl.querySelectorAll('.modal-tab').forEach(tabBtn => {
                     tabBtn.addEventListener('click', function() {
                         const newTab = this.dataset.tab;
-                        modalEl.querySelectorAll('.modal-tab').forEach(t => t.classList.remove(
-                            'active'));
+                        modalEl.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
                         this.classList.add('active');
                         renderAuthForm(newTab);
                         document.getElementById('authError').textContent = '';
@@ -1574,9 +1371,7 @@
                         <button class="btn btn-primary" id="btnLogin" style="width:100%;">Войти</button>
                     `;
                     document.getElementById('btnLogin').addEventListener('click', handleLogin);
-                    document.getElementById('loginPassword').addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter') handleLogin();
-                    });
+                    document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
                 } else {
                     container.innerHTML = `
                         <div class="form-group">
@@ -1594,9 +1389,7 @@
                         <button class="btn btn-primary" id="btnRegister" style="width:100%;">Зарегистрироваться</button>
                     `;
                     document.getElementById('btnRegister').addEventListener('click', handleRegister);
-                    document.getElementById('regPasswordConfirm').addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter') handleRegister();
-                    });
+                    document.getElementById('regPasswordConfirm').addEventListener('keydown', e => { if (e.key === 'Enter') handleRegister(); });
                 }
             }
 
@@ -1604,10 +1397,7 @@
                 const username = document.getElementById('loginUsername').value.trim();
                 const password = document.getElementById('loginPassword').value;
                 const errorEl = document.getElementById('authError');
-                if (!username || !password) {
-                    errorEl.textContent = 'Заполните все поля.';
-                    return;
-                }
+                if (!username || !password) { errorEl.textContent = 'Заполните все поля.'; return; }
                 const result = await loginUser(username, password);
                 if (result.success) {
                     closeModal('authModal');
@@ -1623,14 +1413,8 @@
                 const password = document.getElementById('regPassword').value;
                 const confirm = document.getElementById('regPasswordConfirm').value;
                 const errorEl = document.getElementById('authError');
-                if (!username || !password || !confirm) {
-                    errorEl.textContent = 'Заполните все поля.';
-                    return;
-                }
-                if (password !== confirm) {
-                    errorEl.textContent = 'Пароли не совпадают.';
-                    return;
-                }
+                if (!username || !password || !confirm) { errorEl.textContent = 'Заполните все поля.'; return; }
+                if (password !== confirm) { errorEl.textContent = 'Пароли не совпадают.'; return; }
                 const result = await registerUser(username, password);
                 if (result.success) {
                     closeModal('authModal');
@@ -1641,14 +1425,8 @@
                 }
             }
 
-            // ============================================================
-            //  МОДАЛЬНОЕ ОКНО: СОЗДАНИЕ ТЕМЫ
-            // ============================================================
             function openCreateTopicModal() {
-                if (!isLoggedIn()) {
-                    openAuthModal('login');
-                    return;
-                }
+                if (!isLoggedIn()) { openAuthModal('login'); return; }
                 const modalId = 'createTopicModal';
                 const contentHTML = `
                     <h2>📝 Новая тема</h2>
@@ -1674,7 +1452,6 @@
                 `;
                 openModal(modalId, contentHTML);
 
-                // Временное хранилище вложений для новой темы
                 let tempAttachments = [];
 
                 document.getElementById('btnSubmitTopic').addEventListener('click', async function() {
@@ -1689,13 +1466,10 @@
                         return;
                     }
 
-                    // Собираем вложения
                     let allAttachments = [...tempAttachments];
                     if (urlInput) {
-                        if (isImageURL(urlInput)) allAttachments.push({ type: 'image', url: urlInput,
-                            name: 'image_url' });
-                        else if (isVideoURL(urlInput)) allAttachments.push({ type: 'video', url: urlInput,
-                            name: 'video_url' });
+                        if (isImageURL(urlInput)) allAttachments.push({ type: 'image', url: urlInput, name: 'image_url' });
+                        else if (isVideoURL(urlInput)) allAttachments.push({ type: 'video', url: urlInput, name: 'video_url' });
                         else allAttachments.push({ type: 'link', url: urlInput, name: 'link' });
                     }
 
@@ -1717,21 +1491,15 @@
                         const hintEl = document.getElementById('topicAttachmentHint');
                         for (const file of files) {
                             const sizeCheck = validateFileSize(file, 2);
-                            if (!sizeCheck.valid) {
-                                hintEl.textContent = sizeCheck.error;
-                                continue;
-                            }
+                            if (!sizeCheck.valid) { hintEl.textContent = sizeCheck.error; continue; }
                             try {
                                 const base64 = await fileToBase64(file);
-                                const type = isImageFile(file) ? 'image' : (isVideoFile(file) ? 'video' :
-                                    'file');
+                                const type = isImageFile(file) ? 'image' : (isVideoFile(file) ? 'video' : 'file');
                                 tempAttachments.push({ type, url: base64, name: file.name });
                                 if (type === 'image') {
-                                    previewDiv.innerHTML +=
-                                        `<img src="${base64}" class="attachment-preview" style="max-width:80px;max-height:60px;" title="${escapeHTML(file.name)}">`;
+                                    previewDiv.innerHTML += `<img src="${base64}" class="attachment-preview" style="max-width:80px;max-height:60px;" title="${escapeHTML(file.name)}">`;
                                 } else if (type === 'video') {
-                                    previewDiv.innerHTML +=
-                                        `<video src="${base64}" class="attachment-preview" style="max-width:80px;max-height:60px;" muted title="${escapeHTML(file.name)}"></video>`;
+                                    previewDiv.innerHTML += `<video src="${base64}" class="attachment-preview" style="max-width:80px;max-height:60px;" muted title="${escapeHTML(file.name)}"></video>`;
                                 }
                                 hintEl.textContent = `Загружено: ${tempAttachments.length} файл(ов)`;
                             } catch (e) {
@@ -1742,16 +1510,7 @@
                     };
                 });
             }
-            // Продолжение следует...
-            // ============================================================
-        })();
-    </script>
-</body>
-</html>
-<!-- ПРОДОЛЖЕНИЕ СЛЕДУЕТ -->
-            // ============================================================
-            //  СОЗДАНИЕ ТЕМЫ (вызывается из openCreateTopicModal)
-            // ============================================================
+
             function createTopic(title, content, attachments) {
                 if (!isLoggedIn()) return null;
                 const userId = getCurrentUserId();
@@ -1769,7 +1528,6 @@
                 setData(KEYS.TOPICS, topics);
                 incrementUserTopicCount(userId);
 
-                // Создаём первое сообщение темы
                 const messages = getData(KEYS.MESSAGES) || [];
                 const messageId = getNextId('messages');
                 const newMessage = {
@@ -1797,9 +1555,6 @@
                 return messages.filter(m => m.topicId === topicId).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             }
 
-            // ============================================================
-            //  ДРЕВОВИДНОЕ ПОСТРОЕНИЕ СООБЩЕНИЙ
-            // ============================================================
             function buildMessageTree(messages) {
                 const map = {};
                 const roots = [];
@@ -1843,9 +1598,6 @@
                 return html;
             }
 
-            // ============================================================
-            //  ОТОБРАЖЕНИЕ ТЕМЫ
-            // ============================================================
             function renderTopicView() {
                 if (!currentTopicId) {
                     navigateTo('topics');
@@ -1901,11 +1653,8 @@
                 }
 
                 document.getElementById('viewContainer').innerHTML = html;
-
-                // Обработчик кнопки "Назад"
                 document.getElementById('btnBackToTopics').addEventListener('click', () => navigateTo('topics'));
 
-                // Обработчики ответов
                 if (isLoggedIn()) {
                     let tempReplyAttachments = [];
                     document.getElementById('btnSubmitReply').addEventListener('click', function() {
@@ -1928,7 +1677,6 @@
 
                         const messageId = createMessage(currentTopicId, body, allAttachments, parentId);
                         if (messageId) {
-                            // Обновляем счётчик сообщений в теме
                             const topic = getTopicById(currentTopicId);
                             if (topic) {
                                 topic.messageCount = (topic.messageCount || 0) + 1;
@@ -1940,14 +1688,13 @@
                                     setData(KEYS.TOPICS, topics);
                                 }
                             }
-                            // Очищаем форму и перерендериваем
                             document.getElementById('replyBody').value = '';
                             document.getElementById('replyUrl').value = '';
                             document.getElementById('replyParentId').value = '';
                             document.getElementById('replyAttachmentPreview').innerHTML = '';
                             tempReplyAttachments = [];
                             document.getElementById('replyError').textContent = '';
-                            renderTopicView(); // полный перерендер (можно оптимизировать, но норм)
+                            renderTopicView();
                         } else {
                             errorEl.textContent = 'Ошибка при отправке сообщения.';
                         }
@@ -1962,10 +1709,7 @@
                             const hintEl = document.getElementById('replyAttachmentHint');
                             for (const file of files) {
                                 const sizeCheck = validateFileSize(file, 2);
-                                if (!sizeCheck.valid) {
-                                    hintEl.textContent = sizeCheck.error;
-                                    continue;
-                                }
+                                if (!sizeCheck.valid) { hintEl.textContent = sizeCheck.error; continue; }
                                 try {
                                     const base64 = await fileToBase64(file);
                                     const type = isImageFile(file) ? 'image' : (isVideoFile(file) ? 'video' : 'file');
@@ -1984,7 +1728,6 @@
                         };
                     });
 
-                    // Обработчики кнопок "Ответить" у сообщений
                     document.querySelectorAll('.reply-btn').forEach(btn => {
                         btn.addEventListener('click', function() {
                             const messageId = parseInt(this.dataset.replyTo);
@@ -2016,9 +1759,6 @@
                 return messageId;
             }
 
-            // ============================================================
-            //  ПОИСК
-            // ============================================================
             function renderSearchView() {
                 const container = document.getElementById('viewContainer');
                 let html = `
@@ -2093,9 +1833,6 @@
                 });
             }
 
-            // ============================================================
-            //  ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
-            // ============================================================
             function renderProfileView() {
                 const userId = currentProfileUserId || getCurrentUserId();
                 if (!userId) {
@@ -2162,7 +1899,7 @@
                 `;
                 openModal(modalId, contentHTML);
 
-                let tempAvatar = user.avatar; // текущий или новый
+                let tempAvatar = user.avatar;
 
                 document.getElementById('btnChangeAvatar').addEventListener('click', function() {
                     document.getElementById('editAvatarInput').click();
@@ -2216,9 +1953,6 @@
                 });
             }
 
-            // ============================================================
-            //  УПРАВЛЕНИЕ ЛОГОТИПОМ
-            // ============================================================
             function initLogoHandlers() {
                 document.getElementById('btnUploadLogo').addEventListener('click', function() {
                     document.getElementById('hiddenLogoInput').click();
@@ -2252,24 +1986,17 @@
                 });
             }
 
-            // ============================================================
-            //  ПРИВЯЗКА ГЛОБАЛЬНЫХ СОБЫТИЙ
-            // ============================================================
             function bindGlobalEvents() {
-                // Кнопка входа/регистрации
                 document.getElementById('btnShowAuth').addEventListener('click', () => openAuthModal('login'));
                 document.getElementById('btnLogout').addEventListener('click', () => {
                     logoutUser();
                     renderHeader();
                     navigateTo('topics');
                 });
-                // Клик по приветствию пользователя -> профиль
                 document.getElementById('userGreeting').addEventListener('click', () => {
                     if (isLoggedIn()) navigateTo('profile', { userId: getCurrentUserId() });
                 });
-                // Клик по логотипу/названию -> главная
                 document.getElementById('logoArea').addEventListener('click', () => navigateTo('topics'));
-                // Навигация
                 document.querySelectorAll('#nav-links a[data-view]').forEach(link => {
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -2280,14 +2007,14 @@
                 initLogoHandlers();
             }
 
-            // ============================================================
-            //  ЗАПУСК ПРИЛОЖЕНИЯ
-            // ============================================================
             function initApp() {
                 renderHeader();
                 bindGlobalEvents();
-                navigateTo('topics'); // стартовый вью
+                navigateTo('topics');
             }
 
             initApp();
-            // Конец IIFE
+        })();
+    </script>
+</body>
+</html>
