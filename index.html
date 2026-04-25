@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FusionGate – CS:GO Cheats Forum</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #00ff66;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      border: 1px solid #00ff66;
+      min-height: 100vh;
+    }
+    h1 {
+      text-align: center;
+      letter-spacing: 4px;
+      text-shadow: 0 0 10px #00ff66;
+      margin-bottom: 20px;
+      font-size: 2.5em;
+    }
+    .auth {
+      text-align: right;
+      margin-bottom: 15px;
+    }
+    button, .auth button, .login-form button {
+      background: transparent;
+      color: #00ff66;
+      border: 1px solid #00ff66;
+      padding: 6px 16px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: 1px;
+      transition: 0.3s;
+      margin: 2px;
+    }
+    button:hover {
+      background: #00ff66;
+      color: #0a0a0a;
+    }
+    .new-topic {
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .new-topic input, .new-topic textarea, .login-form input {
+      flex: 1;
+      background: #0a0a0a;
+      border: 1px solid #00ff66;
+      color: #00ff66;
+      padding: 8px;
+      font-family: inherit;
+      outline: none;
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    .topic-list, .comments {
+      list-style: none;
+    }
+    .topic-item, .comment-item {
+      border: 1px solid #005522;
+      margin: 5px 0;
+      padding: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .topic-item:hover { background: #112211; }
+    .topic-title { font-weight: bold; font-size: 1.1em; }
+    .meta { font-size: 0.8em; color: #009944; }
+    .comment-author {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #004422;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+    }
+    .back-btn { margin: 15px 0; }
+    .hidden { display: none; }
+    .error { color: #ff4444; border-color: #ff4444; }
+    hr { border-color:#004422; }
+    a { color: #00ff66; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .login-form {
+      background: #0a0a0a;
+      border: 1px solid #00ff66;
+      padding: 15px;
+      margin: 10px 0;
+    }
+    .login-form h3 { margin-bottom: 10px; }
+    .login-buttons { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .signup-link { font-size: 0.8em; margin-top: 8px; cursor: pointer; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>☠️ FusionGate ☠️</h1>
+
+  <div class="auth">
+    <span id="user-info"></span>
+    <button id="login-btn" class="hidden">🔑 Login / Register</button>
+    <button id="logout-btn" class="hidden">🚪 Logout</button>
+  </div>
+
+  <!-- Форма входа/регистрации -->
+  <div id="auth-modal" class="login-form">
+    <div id="auth-tabs">
+      <button id="show-login" style="border-bottom: 2px solid #00ff66;">Login</button>
+      <button id="show-register">Register</button>
+    </div>
+    <div id="login-form-fields">
+      <input type="email" id="login-email" placeholder="Email" />
+      <input type="password" id="login-password" placeholder="Password" />
+      <button id="email-login-btn">Login with Email</button>
+      <div class="login-buttons">
+        <button id="google-login-btn">Google</button>
+        <button id="github-login-btn">GitHub</button>
+      </div>
+    </div>
+    <div id="register-form-fields" class="hidden">
+      <input type="email" id="reg-email" placeholder="Email" />
+      <input type="password" id="reg-password" placeholder="Password (min 6 chars)" />
+      <button id="email-register-btn">Register</button>
+      <div class="login-buttons">
+        <button id="google-register-btn">Google</button>
+        <button id="github-register-btn">GitHub</button>
+      </div>
+      <div class="signup-link" id="back-to-login">Already have an account? Login</div>
+    </div>
+  </div>
+
+  <div id="topics-view">
+    <div id="new-topic-form" class="new-topic hidden">
+      <input type="text" id="topic-title-input" placeholder="Cheat name / request title..." />
+      <textarea id="topic-body-input" placeholder="First message (details, download, etc.)..."></textarea>
+      <button id="create-topic-btn">Post new topic</button>
+    </div>
+    <h2>📁 Topics</h2>
+    <ul id="topic-list" class="topic-list"></ul>
+    <div id="no-topics" class="hidden">No topics yet. Share your cheat or ask a question!</div>
+  </div>
+
+  <div id="topic-detail" class="hidden">
+    <button class="back-btn">⬅ Back to topics</button>
+    <h2 id="detail-title"></h2>
+    <div id="detail-body" style="white-space: pre-wrap; margin: 15px 0;"></div>
+    <hr>
+    <h3>💬 Replies</h3>
+    <ul id="comment-list" class="comments"></ul>
+    <div id="reply-form" class="new-topic hidden">
+      <textarea id="reply-input" placeholder="Write a reply..."></textarea>
+      <button id="post-reply-btn">Send reply</button>
+    </div>
+  </div>
+
+  <script>
+    // ================= ВАЖНО: ЗАМЕНИ ЭТИ ДАННЫЕ =================
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "000000000000",
+      appId: "YOUR_APP_ID"
+    };
+    const GITHUB_PAGES_URL = "https://yourusername.github.io/your-repo"; // без слеша в конце
+    // ===============================================================
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    const githubProvider = new firebase.auth.GithubAuthProvider();
+
+    // UI элементы
+    const authModal = document.getElementById('auth-modal');
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userInfo = document.getElementById('user-info');
+    const topicsView = document.getElementById('topics-view');
+    const topicDetail = document.getElementById('topic-detail');
+    const newTopicForm = document.getElementById('new-topic-form');
+    const topicListEl = document.getElementById('topic-list');
+    const noTopics = document.getElementById('no-topics');
+    const createTopicBtn = document.getElementById('create-topic-btn');
+    const topicTitleInput = document.getElementById('topic-title-input');
+    const topicBodyInput = document.getElementById('topic-body-input');
+    const backBtn = document.querySelector('.back-btn');
+    const replyForm = document.getElementById('reply-form');
+    const replyInput = document.getElementById('reply-input');
+    const postReplyBtn = document.getElementById('post-reply-btn');
+
+    // Auth UI
+    const showLoginBtn = document.getElementById('show-login');
+    const showRegisterBtn = document.getElementById('show-register');
+    const loginFields = document.getElementById('login-form-fields');
+    const registerFields = document.getElementById('register-form-fields');
+    const loginEmail = document.getElementById('login-email');
+    const loginPassword = document.getElementById('login-password');
+    const regEmail = document.getElementById('reg-email');
+    const regPassword = document.getElementById('reg-password');
+
+    let currentUser = null;
+
+    // Переключение табов логин/регистрация
+    showLoginBtn.addEventListener('click', () => {
+      showLoginBtn.style.borderBottom = '2px solid #00ff66';
+      showRegisterBtn.style.borderBottom = 'none';
+      loginFields.classList.remove('hidden');
+      registerFields.classList.add('hidden');
+    });
+    showRegisterBtn.addEventListener('click', () => {
+      showRegisterBtn.style.borderBottom = '2px solid #00ff66';
+      showLoginBtn.style.borderBottom = 'none';
+      registerFields.classList.remove('hidden');
+      loginFields.classList.add('hidden');
+    });
+    document.getElementById('back-to-login').addEventListener('click', () => {
+      showLoginBtn.click();
+    });
+
+    // Отслеживание состояния аутентификации
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      updateUI(user);
+      if (user) {
+        loadTopics();
+        const params = new URLSearchParams(window.location.search);
+        const topicId = params.get('topic');
+        if (topicId) loadTopic(topicId);
+      } else {
+        loadTopics();
+      }
+    });
+
+    // Результат редиректа (Google, GitHub)
+    auth.getRedirectResult().then(result => {
+      if (result.user) console.log('Logged in as', result.user);
+    }).catch(error => {
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        alert('An account already exists with this email. Please sign in using that method.');
+      } else if (error.code !== 'auth/cancelled-popup-request') {
+        console.error('Login error:', error.message);
+      }
+    });
+
+    function updateUI(user) {
+      if (user) {
+        authModal.classList.add('hidden');
+        logoutBtn.classList.remove('hidden');
+        loginBtn.classList.add('hidden');
+        userInfo.textContent = `@${user.displayName || user.email || user.uid}`;
+        newTopicForm.classList.remove('hidden');
+        replyForm.classList.remove('hidden');
+      } else {
+        authModal.classList.remove('hidden');
+        logoutBtn.classList.add('hidden');
+        loginBtn.classList.add('hidden');
+        userInfo.textContent = '';
+        newTopicForm.classList.add('hidden');
+        replyForm.classList.add('hidden');
+        loginEmail.value = '';
+        loginPassword.value = '';
+        regEmail.value = '';
+        regPassword.value = '';
+      }
+    }
+
+    // Email/Password вход
+    document.getElementById('email-login-btn').addEventListener('click', async () => {
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value.trim();
+      if (!email || !password) return alert('Email and password required.');
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+      } catch (error) {
+        alert('Login error: ' + error.message);
+      }
+    });
+
+    // Email/Password регистрация
+    document.getElementById('email-register-btn').addEventListener('click', async () => {
+      const email = regEmail.value.trim();
+      const password = regPassword.value.trim();
+      if (!email || !password) return alert('Email and password required.');
+      if (password.length < 6) return alert('Password must be at least 6 characters.');
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+      } catch (error) {
+        alert('Registration error: ' + error.message);
+      }
+    });
+
+    // Google вход (одинаково для логина и регистрации)
+    document.getElementById('google-login-btn').addEventListener('click', () => {
+      auth.signInWithRedirect(googleProvider);
+    });
+    document.getElementById('google-register-btn').addEventListener('click', () => {
+      auth.signInWithRedirect(googleProvider);
+    });
+
+    // GitHub вход
+    document.getElementById('github-login-btn').addEventListener('click', () => {
+      auth.signInWithRedirect(githubProvider);
+    });
+    document.getElementById('github-register-btn').addEventListener('click', () => {
+      auth.signInWithRedirect(githubProvider);
+    });
+
+    // Выход
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut();
+    });
+
+    // ========== Работа с темами ==========
+    async function loadTopics() {
+      const snapshot = await db.collection('topics').orderBy('createdAt', 'desc').get();
+      topicListEl.innerHTML = '';
+      if (snapshot.empty) {
+        noTopics.classList.remove('hidden');
+        return;
+      }
+      noTopics.classList.add('hidden');
+      snapshot.forEach(doc => {
+        const topic = doc.data();
+        const li = document.createElement('li');
+        li.className = 'topic-item';
+        li.innerHTML = `
+          <div class="topic-title">${escapeHtml(topic.title)}</div>
+          <div class="meta">by ${topic.authorName} • ${new Date(topic.createdAt?.toDate ? topic.createdAt.toDate() : topic.createdAt).toLocaleString()}</div>
+        `;
+        li.addEventListener('click', () => {
+          history.pushState({}, '', `${window.location.pathname}?topic=${doc.id}`);
+          loadTopic(doc.id);
+        });
+        topicListEl.appendChild(li);
+      });
+    }
+
+    async function loadTopic(topicId) {
+      if (!topicId) return;
+      topicsView.classList.add('hidden');
+      topicDetail.classList.remove('hidden');
+
+      const docRef = db.collection('topics').doc(topicId);
+      const doc = await docRef.get();
+      if (!doc.exists) {
+        alert('Topic not found');
+        backToList();
+        return;
+      }
+      const topic = doc.data();
+      document.getElementById('detail-title').textContent = topic.title;
+      document.getElementById('detail-body').textContent = topic.body;
+
+      const commentsSnap = await docRef.collection('comments').orderBy('createdAt', 'asc').get();
+      const commentList = document.getElementById('comment-list');
+      commentList.innerHTML = '';
+      commentsSnap.forEach(commDoc => {
+        const comm = commDoc.data();
+        const li = document.createElement('li');
+        li.className = 'comment-item';
+        li.innerHTML = `
+          <div class="comment-author">
+            <span>${escapeHtml(comm.authorName)}</span>
+            <span class="meta">${new Date(comm.createdAt?.toDate ? comm.createdAt.toDate() : comm.createdAt).toLocaleString()}</span>
+          </div>
+          <div>${escapeHtml(comm.body)}</div>
+        `;
+        commentList.appendChild(li);
+      });
+
+      topicDetail.dataset.topicId = topicId;
+    }
+
+    // Создание темы
+    createTopicBtn.addEventListener('click', async () => {
+      const title = topicTitleInput.value.trim();
+      const body = topicBodyInput.value.trim();
+      if (!title || !body) return alert('Both title and body are required.');
+      if (!currentUser) return alert('Login first.');
+
+      try {
+        await db.collection('topics').add({
+          title,
+          body,
+          authorUid: currentUser.uid,
+          authorName: currentUser.displayName || currentUser.email || currentUser.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        topicTitleInput.value = '';
+        topicBodyInput.value = '';
+        loadTopics();
+      } catch (err) {
+        console.error('Error creating topic:', err);
+        alert('Failed to create topic.');
+      }
+    });
+
+    // Ответ на тему
+    postReplyBtn.addEventListener('click', async () => {
+      const body = replyInput.value.trim();
+      if (!body) return alert('Reply cannot be empty.');
+      if (!currentUser) return alert('Login first.');
+      const topicId = topicDetail.dataset.topicId;
+      if (!topicId) return;
+
+      try {
+        await db.collection('topics').doc(topicId).collection('comments').add({
+          body,
+          authorUid: currentUser.uid,
+          authorName: currentUser.displayName || currentUser.email || currentUser.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        replyInput.value = '';
+        loadTopic(topicId);
+      } catch (err) {
+        console.error('Error posting reply:', err);
+        alert('Failed to post reply.');
+      }
+    });
+
+    // Навигация
+    backBtn.addEventListener('click', backToList);
+    function backToList() {
+      history.pushState({}, '', window.location.pathname);
+      topicsView.classList.remove('hidden');
+      topicDetail.classList.add('hidden');
+      loadTopics();
+    }
+    window.addEventListener('popstate', () => {
+      const params = new URLSearchParams(window.location.search);
+      const topicId = params.get('topic');
+      if (topicId) loadTopic(topicId);
+      else backToList();
+    });
+
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, function(m) {
+        return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m];
+      });
+    }
+
+    // Первая загрузка
+    loadTopics();
+    const params = new URLSearchParams(window.location.search);
+    const topicId = params.get('topic');
+    if (topicId && auth.currentUser) {
+      loadTopic(topicId);
+    }
+  </script>
+</body>
+</html>
